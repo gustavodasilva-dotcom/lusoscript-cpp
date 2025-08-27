@@ -5,13 +5,16 @@
 
 class ErrorState {
 public:
+	explicit ErrorState();
+
+	void error(int line, std::string message);
 	bool getHadError();
-	void setHadError();
 	void resetHadError();
 private:
-	bool had_error_ = false;
-};
+	bool had_error_;
 
-void error(ErrorState *state, int line, std::string message);
+	void report(int line, std::string where, std::string message);
+	void setHadError();
+};
 
 #endif

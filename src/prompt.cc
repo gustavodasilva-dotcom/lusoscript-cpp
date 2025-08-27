@@ -14,8 +14,6 @@ void Prompt::run() {
 	ErrorState error_state;
 
 	while (std::getline(std::cin, input)) {
-		std::cout << input << std::endl;
-
 		interpreter.process(&error_state, std::move(input));
 
 		error_state.resetHadError();
