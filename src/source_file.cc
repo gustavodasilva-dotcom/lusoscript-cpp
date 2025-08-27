@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <sysexits.h>
 
 #include "lusoscript/error.hh"
 #include "lusoscript/interpreter.hh"
@@ -38,6 +39,6 @@ void SourceFile::run(std::string file_path) {
 	interpreter.process(&error_state, std::move(file_content));
 
 	if (error_state.getHadError()) {
-		exit(65);
+		exit(EX_DATAERR);
 	}
 }
