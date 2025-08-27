@@ -1,9 +1,10 @@
-#include "lusoscript/interpreter.hh"
-#include "lusoscript/source_file.hh"
-
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+
+#include "lusoscript/error.hh"
+#include "lusoscript/interpreter.hh"
+#include "lusoscript/source_file.hh"
 
 void SourceFile::run(std::string file_path) {
 	std::filesystem::path path = file_path;
@@ -31,6 +32,12 @@ void SourceFile::run(std::string file_path) {
 		file_content = contents_stream.str();
 	}
 
+	ErrorState error_state;
+
 	Interpreter interpreter;
-	interpreter.process(std::move(file_content));
+	interpreter.process(&error_state, std::move(file_content));
+
+	if (error_state.getHadError()) {
+		exit(65);
+	}
 }

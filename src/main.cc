@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "lusoscript/core.hh"
 #include "lusoscript/source_file.hh"
 #include "lusoscript/prompt.hh"
 
@@ -16,6 +17,6 @@ int main(int argc, char* argv[]) {
 		return EXIT_SUCCESS;
 	} else {
 		std::cerr << "Usage: luso [script]" << std::endl;
-		return EXIT_FAILURE;
+		exit(EXIT_USAGE);
 	}
 }

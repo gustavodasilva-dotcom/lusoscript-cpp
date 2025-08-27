@@ -1,7 +1,8 @@
+#include <iostream>
+
+#include "lusoscript/error.hh"
 #include "lusoscript/interpreter.hh"
 #include "lusoscript/prompt.hh"
-
-#include <iostream>
 
 void Prompt::run() {
 	Interpreter interpreter;
@@ -10,10 +11,14 @@ void Prompt::run() {
 
 	std::cout << "> ";
 
+	ErrorState error_state;
+
 	while (std::getline(std::cin, input)) {
 		std::cout << input << std::endl;
 
-		interpreter.process(std::move(input));
+		interpreter.process(&error_state, std::move(input));
+
+		error_state.resetHadError();
 
 		std::cout << "> ";
 	}

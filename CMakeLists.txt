@@ -4,6 +4,7 @@ project(luso)
 set(CMAKE_CXX_STANDARD 20)
 
 add_library(lusoscript
+	src/error.cc
 	src/interpreter.cc
 	src/prompt.cc
 	src/scanner.cc

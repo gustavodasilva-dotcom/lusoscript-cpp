@@ -3,9 +3,11 @@
 
 #include <string>
 
+#include "error.hh"
+
 class Interpreter {
 public:
-	void process(std::string source);
+	void process(ErrorState *error_state, std::string source);
 };
 
 #endif
