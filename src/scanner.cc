@@ -77,6 +77,8 @@ void Scanner::scanToken() {
 		if (match('/')) {
 			while (peek() != '\n' && !isAtEnd())
 				advance();
+		} else if (match('*')) {
+			scanMultilineComment();
 		} else {
 			addToken(token::TokenType::SC_FORWARD_SLASH);
 		}
@@ -122,6 +124,24 @@ void Scanner::scanString() {
 	// Extract the string literal value without the enclosing double quotes.
 	std::string value = source_.substr(start_ + 1, (current_ - 1) - (start_ + 1));
 	addToken(token::TokenType::LT_STRING, value);
+}
+
+void Scanner::scanMultilineComment() {
+	while (peek() != '*' || peekNext() != '/') {
+		if (isAtEnd()) {
+			error_state_->error(line_, "Unterminated multiline comment.");
+			return;
+		}
+
+		if (peek() == '\n')
+			line_++;
+
+		advance();
+	}
+
+	// If it isn't an unterminated comment, the remaining multiline characters ('*' and '/') are consumed.
+	advance();
+	advance();
 }
 
 void Scanner::scanNumber() {

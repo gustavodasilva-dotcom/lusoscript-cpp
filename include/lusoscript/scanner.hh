@@ -24,6 +24,7 @@ private:
 	bool isAtEnd();
 	void scanToken();
 	void scanString();
+	void scanMultilineComment();
 	void scanNumber();
 	void scanIdentifier();
 	bool isDigit(char c);

@@ -1,0 +1,19 @@
+// This is not processed.
+var greeting = "Hello world!";
+
+/*
+ * A multiline comment is...
+ * ...also not processed.
+ * 
+ The star at the beginning of each line is just for style. It's not required.
+ */
+
+var farewell = "See you soon.";
+var weather_in_c = 25.7;
+
+/*
+ * An unterminated comment, which generates an error.
+
+The following incorrect variable declaration (that misses the semicolon at the end of the line) is never reached:
+
+var weather_in_f = (weather_in_c * 9 / 5) + 32
