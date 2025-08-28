@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <unordered_map>
 
 namespace token {
 	enum class TokenType {
@@ -24,6 +25,40 @@ namespace token {
 		LT_IDENTIFIER, LT_STRING, LT_NUMBER,
 
 		END_OF_FILE,
+	};
+
+	const std::string KW_E = "e";
+	const std::string KW_CLASSE = "classe";
+	const std::string KW_SENAO = "senao";
+	const std::string KW_FALSO = "falso";
+	const std::string KW_FUNCAO = "funcao";
+	const std::string KW_PARA = "para";
+	const std::string KW_SE = "nulo";
+	const std::string KW_OU = "ou";
+	const std::string KW_IMPRIMA = "imprima";
+	const std::string KW_RETORNE = "retorne";
+	const std::string KW_SUPER = "super";
+	const std::string KW_ESSE = "esse";
+	const std::string KW_VERDADEIRO = "verdadeiro";
+	const std::string KW_VAR = "var";
+	const std::string KW_ENQUANTO = "enquanto";
+
+	const std::unordered_map<std::string, TokenType> Keywords = {
+		{KW_E, TokenType::KW_E},
+		{KW_CLASSE, TokenType::KW_CLASSE},
+		{KW_SENAO, TokenType::KW_SENAO},
+		{KW_FALSO, TokenType::KW_FALSO},
+		{KW_FUNCAO, TokenType::KW_FUNCAO},
+		{KW_PARA, TokenType::KW_PARA},
+		{KW_SE, TokenType::KW_SE},
+		{KW_OU, TokenType::KW_OU},
+		{KW_IMPRIMA, TokenType::KW_IMPRIMA},
+		{KW_RETORNE, TokenType::KW_RETORNE},
+		{KW_SUPER, TokenType::KW_SUPER},
+		{KW_ESSE, TokenType::KW_ESSE},
+		{KW_VERDADEIRO, TokenType::KW_VERDADEIRO},
+		{KW_VAR, TokenType::KW_VAR},
+		{KW_ENQUANTO, TokenType::KW_ENQUANTO},
 	};
 
 	class Token {

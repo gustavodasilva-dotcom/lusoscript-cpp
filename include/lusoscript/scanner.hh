@@ -23,10 +23,18 @@ private:
 
 	bool isAtEnd();
 	void scanToken();
+	void scanString();
+	void scanNumber();
+	void scanIdentifier();
+	bool isDigit(char c);
+	bool isAlpha(char c);
+	bool isAlphaNumeric(char c);
 	char advance();
+	char peek();
+	char peekNext();
+	bool match(char expected);
 	void addToken(token::TokenType token_type);
 	void addToken(token::TokenType token_type, std::string literal);
-	bool match(char expected);
 };
 
 #endif
