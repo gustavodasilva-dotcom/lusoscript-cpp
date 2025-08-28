@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sysexits.h>
 
+#include "lusoscript/repl.hh"
 #include "lusoscript/source_file.hh"
-#include "lusoscript/prompt.hh"
 
 int main(int argc, char* argv[]) {
 	if (argc == 2) {
@@ -11,8 +11,8 @@ int main(int argc, char* argv[]) {
 
 		return EXIT_SUCCESS;
 	} else if (argc == 1) {
-		Prompt prompt;
-		prompt.run();
+		Repl repl;
+		repl.run();
 
 		return EXIT_SUCCESS;
 	} else {

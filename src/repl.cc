@@ -2,9 +2,9 @@
 
 #include "lusoscript/error.hh"
 #include "lusoscript/interpreter.hh"
-#include "lusoscript/prompt.hh"
+#include "lusoscript/repl.hh"
 
-void Prompt::run() {
+void Repl::run() {
 	Interpreter interpreter;
 
 	std::string input;

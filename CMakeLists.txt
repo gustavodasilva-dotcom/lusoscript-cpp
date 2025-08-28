@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_library(lusoscript
 	src/error.cc
 	src/interpreter.cc
-	src/prompt.cc
+	src/repl.cc
 	src/scanner.cc
 	src/source_file.cc
 	src/token.cc
