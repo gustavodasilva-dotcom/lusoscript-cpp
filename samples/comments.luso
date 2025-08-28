@@ -1,11 +1,19 @@
-// This is not processed.
+// This is not processed. /* This multiline comment is ignored. */
 var greeting = "Hello world!";
+
+// A single-line comment... // Followed by more of the same... Are treated as separate comments.
 
 /*
  * A multiline comment is...
  * ...also not processed.
+ *
+ * // A single-line comment inside a comment.
  * 
  The star at the beginning of each line is just for style. It's not required.
+ // Another single-line comment.
+
+ /* Nested multiline comment. */
+ /* Another nested multiline comment. */
  */
 
 var farewell = "See you soon.";

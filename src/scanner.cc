@@ -136,7 +136,11 @@ void Scanner::scanMultilineComment() {
 		if (peek() == '\n')
 			line_++;
 
-		advance();
+		char c = advance();
+
+		// Recursion for nested multiline comments.
+		if (c == '/' && match('*'))
+			scanMultilineComment();
 	}
 
 	// If it isn't an unterminated comment, the remaining multiline characters ('*' and '/') are consumed.
