@@ -116,12 +116,12 @@ void Scanner::scanString() {
 		return;
 	}
 
-	// Extract the string literal value without the enclosing double quotes.
-	std::string value = source_.substr(start_ + 1, current_ - start_ - 1);
-	addToken(token::TokenType::LT_STRING, value);
-
 	// Consume the remaining closing double quote ('"').
 	advance();
+
+	// Extract the string literal value without the enclosing double quotes.
+	std::string value = source_.substr(start_ + 1, (current_ - 1) - (start_ + 1));
+	addToken(token::TokenType::LT_STRING, value);
 }
 
 void Scanner::scanNumber() {
@@ -205,7 +205,7 @@ bool Scanner::match(char expected) {
 }
 
 void Scanner::addToken(token::TokenType token_type) {
-	tokens_.push_back({.type = token_type});
+	tokens_.push_back({.type = token_type, .line = line_});
 }
 
 void Scanner::addToken(token::TokenType token_type, std::string literal) {

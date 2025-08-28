@@ -33,7 +33,8 @@ namespace token {
 	const std::string KW_FALSO = "falso";
 	const std::string KW_FUNCAO = "funcao";
 	const std::string KW_PARA = "para";
-	const std::string KW_SE = "nulo";
+	const std::string KW_SE = "se";
+	const std::string KW_NULO = "nulo";
 	const std::string KW_OU = "ou";
 	const std::string KW_IMPRIMA = "imprima";
 	const std::string KW_RETORNE = "retorne";
@@ -42,6 +43,31 @@ namespace token {
 	const std::string KW_VERDADEIRO = "verdadeiro";
 	const std::string KW_VAR = "var";
 	const std::string KW_ENQUANTO = "enquanto";
+	const std::string SC_OPEN_PAREN = "(";
+	const std::string SC_CLOSE_PAREN = ")";
+	const std::string SC_OPEN_CURLY = "{";
+	const std::string SC_CLOSE_CURLY = "}";
+	const std::string SC_COMMA = ",";
+	const std::string SC_DOT = ".";
+	const std::string SC_MINUS = "-";
+	const std::string SC_PLUS = "+";
+	const std::string SC_SEMICOLON = ";";
+	const std::string SC_FORWARD_SLASH = "/";
+	const std::string SC_STAR = "*";
+	const std::string MC_EXCL = "!";
+	const std::string MC_EXCL_EQUAL = "!=";
+	const std::string MC_EQUAL = "=";
+	const std::string MC_EQUAL_EQUAL = "==";
+	const std::string MC_GREATER = ">";
+	const std::string MC_GREATER_EQUAL = ">=";
+	const std::string MC_LESS = "<";
+	const std::string MC_LESS_EQUAL = "<=";
+	const std::string LT_IDENTIFIER = "identifier";
+	const std::string LT_STRING = "string";
+	const std::string LT_NUMBER = "number";
+	const std::string END_OF_FILE = "EOF";
+
+	std::string toString(TokenType token_type);
 
 	const std::unordered_map<std::string, TokenType> Keywords = {
 		{KW_E, TokenType::KW_E},
@@ -67,6 +93,8 @@ namespace token {
 		std::optional<std::string> lexeme;
 		std::optional<std::string> literal;
 		int line;
+
+		std::string toString();
 	};
 }
 

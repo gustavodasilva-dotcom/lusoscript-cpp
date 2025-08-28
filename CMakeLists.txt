@@ -9,6 +9,7 @@ add_library(lusoscript
 	src/prompt.cc
 	src/scanner.cc
 	src/source_file.cc
+	src/token.cc
 )
 
 target_include_directories(lusoscript
