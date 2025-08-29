@@ -88,17 +88,19 @@ std::string toString(token::TokenType token_type) {
 }
 
 std::string token::Token::toString() {
-  std::string result = "Token type: " + ::toString(type);
+  std::string output;
 
-  if (lexeme.has_value()) {
-    result += " / lexeme: " + lexeme.value();
+  if (lexeme.has_value() && !lexeme.value().empty()) {
+    output.append("[" + ::toString(type) + ":" + lexeme.value() + "]");
+  } else {
+    output.append("[" + ::toString(type) + "]");
   }
 
   if (literal.has_value()) {
-    result += " / literal: " + literal.value();
+    output.append(" (literal:" + literal.value() + ")");
   }
 
-  result += " / line: " + std::to_string(line);
+  output.append(" (line " + std::to_string(line) + ")");
 
-  return result;
+  return output;
 }

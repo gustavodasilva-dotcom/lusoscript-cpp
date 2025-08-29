@@ -50,6 +50,58 @@ var no_value = nulo;
 
 ## Expressions
 
+LusoScript's formal grammar specification for _expressions_:
+
+<div style="display: flex; justify-content: center; margin: 2em 0; font-family: monospace; line-height: 1.6;">
+  <div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">expression</div>
+      <div style="text-align: left;">
+        → <span style="font-style: italic;">literal</span> |
+          <span style="font-style: italic;">unary</span> |
+          <span style="font-style: italic;">binary</span> |
+          <span style="font-style: italic;">grouping</span> ;
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">literal</div>
+      <div style="text-align: left;">
+        → <code>NUMBER</code> | <code>STRING</code> |
+          <code>"verdadeiro"</code> | <code>"falso"</code> | <code>"nulo"</code> ;
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">grouping</div>
+      <div style="text-align: left;">
+        → <code>(</code> <span style="font-style: italic;">expression</span> <code>)</code> ;
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">unary</div>
+      <div style="text-align: left;">
+        → ( <code>-</code> | <code>!</code> ) <span style="font-style: italic;">expression</span> ;
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">binary</div>
+      <div style="text-align: left;">
+        → <span style="font-style: italic;">expression</span>
+          <span style="font-style: italic;">operator</span>
+          <span style="font-style: italic;">expression</span> ;
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="width: 130px; font-weight: bold; text-align: left;">operator</div>
+      <div style="text-align: left;">
+        → <code>==</code> | <code>!=</code> | <code>&lt;</code> | <code>&lt;=</code> |
+          <code>&gt;</code> | <code>&gt;=</code> | <code>+</code> |
+          <code>-</code> | <code>*</code> | <code>/</code> ;
+      </div>
+    </div>
+  </div>
+</div>
+
+
 ### Arithmetic
 
 ```
