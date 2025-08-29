@@ -2,11 +2,11 @@
 
 #include <iostream>
 
-#include "lusoscript/scanner.hh"
+#include "lusoscript/lexer.hh"
 
 void Interpreter::process(ErrorState *error_state, std::string source) {
-  Scanner scanner(std::move(source), error_state);
-  std::vector<token::Token> tokens = scanner.scanTokens();
+  Lexer lexer(std::move(source), error_state);
+  std::vector<token::Token> tokens = lexer.scanTokens();
 
   for (token::Token token : tokens) {
     std::cout << token.toString() << std::endl;

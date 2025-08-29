@@ -1,5 +1,5 @@
-#ifndef LUSOSCRIPT_SCANNER_H
-#define LUSOSCRIPT_SCANNER_H
+#ifndef LUSOSCRIPT_LEXER_H
+#define LUSOSCRIPT_LEXER_H
 
 #include <string>
 #include <vector>
@@ -7,9 +7,9 @@
 #include "error.hh"
 #include "token.hh"
 
-class Scanner {
+class Lexer {
  public:
-  explicit Scanner(std::string source, ErrorState *error_state);
+  explicit Lexer(std::string source, ErrorState *error_state);
 
   std::vector<token::Token> scanTokens();
 

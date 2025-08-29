@@ -7,8 +7,8 @@ add_library(lusoscript
 	src/ast.cc
 	src/error.cc
 	src/interpreter.cc
+	src/lexer.cc
 	src/repl.cc
-	src/scanner.cc
 	src/source_file.cc
 	src/token.cc
 )

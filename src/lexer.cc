@@ -1,13 +1,13 @@
-#include "lusoscript/scanner.hh"
+#include "lusoscript/lexer.hh"
 
-Scanner::Scanner(std::string source, ErrorState *error_state)
+Lexer::Lexer(std::string source, ErrorState *error_state)
     : source_(std::move(source)),
       error_state_(error_state),
       start_(0),
       current_(0),
       line_(1) {}
 
-std::vector<token::Token> Scanner::scanTokens() {
+std::vector<token::Token> Lexer::scanTokens() {
   while (!isAtEnd()) {
     start_ = current_;
     scanToken();
@@ -19,9 +19,9 @@ std::vector<token::Token> Scanner::scanTokens() {
   return tokens_;
 }
 
-bool Scanner::isAtEnd() { return current_ >= source_.length(); }
+bool Lexer::isAtEnd() { return current_ >= source_.length(); }
 
-void Scanner::scanToken() {
+void Lexer::scanToken() {
   char c = advance();
 
   switch (c) {
@@ -102,7 +102,7 @@ void Scanner::scanToken() {
   }
 }
 
-void Scanner::scanString() {
+void Lexer::scanString() {
   while (peek() != '"' && !isAtEnd()) {
     if (peek() == '\n') line_++;
 
@@ -122,7 +122,7 @@ void Scanner::scanString() {
   addToken(token::TokenType::LT_STRING, value);
 }
 
-void Scanner::scanMultilineComment() {
+void Lexer::scanMultilineComment() {
   while (peek() != '*' || peekNext() != '/') {
     if (isAtEnd()) {
       error_state_->error(line_, "Unterminated multiline comment.");
@@ -143,7 +143,7 @@ void Scanner::scanMultilineComment() {
   advance();
 }
 
-void Scanner::scanNumber() {
+void Lexer::scanNumber() {
   while (isDigit(peek())) advance();
 
   // Checking if the current character is a decimal separator.
@@ -159,7 +159,7 @@ void Scanner::scanNumber() {
   addToken(token::TokenType::LT_NUMBER, value);
 }
 
-void Scanner::scanIdentifier() {
+void Lexer::scanIdentifier() {
   // Using the "maximal-munch" principle (consuming as many characters as
   // possible).
   while (isAlphaNumeric(peek())) advance();
@@ -180,29 +180,29 @@ void Scanner::scanIdentifier() {
   addToken(token_type);
 }
 
-bool Scanner::isDigit(char c) { return c >= '0' && c <= '9'; }
+bool Lexer::isDigit(char c) { return c >= '0' && c <= '9'; }
 
-bool Scanner::isAlpha(char c) {
+bool Lexer::isAlpha(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-bool Scanner::isAlphaNumeric(char c) { return isAlpha(c) || isDigit(c); }
+bool Lexer::isAlphaNumeric(char c) { return isAlpha(c) || isDigit(c); }
 
-char Scanner::advance() { return source_.at(current_++); }
+char Lexer::advance() { return source_.at(current_++); }
 
-char Scanner::peek() {
+char Lexer::peek() {
   if (isAtEnd()) return '\0';
 
   return source_.at(current_);
 }
 
-char Scanner::peekNext() {
+char Lexer::peekNext() {
   if (current_ + 1 >= source_.length()) return '\0';
 
   return source_.at(current_ + 1);
 }
 
-bool Scanner::match(char expected) {
+bool Lexer::match(char expected) {
   if (isAtEnd()) return false;
 
   if (source_.at(current_) != expected) return false;
@@ -212,11 +212,11 @@ bool Scanner::match(char expected) {
   return true;
 }
 
-void Scanner::addToken(token::TokenType token_type) {
+void Lexer::addToken(token::TokenType token_type) {
   tokens_.push_back({.type = token_type, .line = line_});
 }
 
-void Scanner::addToken(token::TokenType token_type, std::string literal) {
+void Lexer::addToken(token::TokenType token_type, std::string literal) {
   std::string lexeme = source_.substr(start_, current_ - start_);
   tokens_.push_back({token_type, lexeme, literal, line_});
 }
