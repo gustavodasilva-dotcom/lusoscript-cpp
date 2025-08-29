@@ -1,23 +1,24 @@
+#include "lusoscript/repl.hh"
+
 #include <iostream>
 
 #include "lusoscript/error.hh"
 #include "lusoscript/interpreter.hh"
-#include "lusoscript/repl.hh"
 
 void Repl::run() {
-	Interpreter interpreter;
+  Interpreter interpreter;
 
-	std::string input;
+  std::string input;
 
-	std::cout << "> ";
+  std::cout << "> ";
 
-	ErrorState error_state;
+  ErrorState error_state;
 
-	while (std::getline(std::cin, input)) {
-		interpreter.process(&error_state, std::move(input));
+  while (std::getline(std::cin, input)) {
+    interpreter.process(&error_state, std::move(input));
 
-		error_state.resetHadError();
+    error_state.resetHadError();
 
-		std::cout << "> ";
-	}
+    std::cout << "> ";
+  }
 }

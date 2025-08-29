@@ -4,8 +4,8 @@
 #include <string>
 
 class SourceFile {
-public:
-	void run(std::string file_path);
+ public:
+  void run(std::string file_path);
 };
 
 #endif

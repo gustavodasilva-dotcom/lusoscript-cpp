@@ -2,8 +2,8 @@
 #define LUSOSCRIPT_REPL_H
 
 class Repl {
-public:
-	void run();
+ public:
+  void run();
 };
 
 #endif

@@ -6,8 +6,8 @@
 #include "error.hh"
 
 class Interpreter {
-public:
-	void process(ErrorState *error_state, std::string source);
+ public:
+  void process(ErrorState *error_state, std::string source);
 };
 
 #endif
