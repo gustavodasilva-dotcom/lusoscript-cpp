@@ -48,59 +48,38 @@ LusoScript has support for a value that represents "no value." `nulo` is our own
 var no_value = nulo;
 ```
 
+### Precedence and associativity
+
+The rules established by C are adhered to by LusoScript, as illustrated in the table below, with equality having the lowest precedence and unary the highest:
+
+| Name       | Operators | Associates |
+|------------|-----------|------------|
+| Equality   | == !=     | Left       |
+| Comparison | > >= < <= | Left       |
+| Term       | - +       | Left       |
+| Factor     | / *       | Left       |
+| Unary      | ! -       | Right      |
+_Extracted from "Crafting Interpreters" by Robert Nystrom_
+
+The precedence can be changed by using parentheses:
+
+```
+var c = (4 + 2) / 2;
+```
+
 ## Expressions
 
 LusoScript's formal grammar specification for _expressions_:
 
-<div style="display: flex; justify-content: center; margin: 2em 0; font-family: monospace; line-height: 1.6;">
-  <div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">expression</div>
-      <div style="text-align: left;">
-        → <span style="font-style: italic;">literal</span> |
-          <span style="font-style: italic;">unary</span> |
-          <span style="font-style: italic;">binary</span> |
-          <span style="font-style: italic;">grouping</span> ;
-      </div>
-    </div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">literal</div>
-      <div style="text-align: left;">
-        → <code>NUMBER</code> | <code>STRING</code> |
-          <code>"verdadeiro"</code> | <code>"falso"</code> | <code>"nulo"</code> ;
-      </div>
-    </div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">grouping</div>
-      <div style="text-align: left;">
-        → <code>(</code> <span style="font-style: italic;">expression</span> <code>)</code> ;
-      </div>
-    </div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">unary</div>
-      <div style="text-align: left;">
-        → ( <code>-</code> | <code>!</code> ) <span style="font-style: italic;">expression</span> ;
-      </div>
-    </div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">binary</div>
-      <div style="text-align: left;">
-        → <span style="font-style: italic;">expression</span>
-          <span style="font-style: italic;">operator</span>
-          <span style="font-style: italic;">expression</span> ;
-      </div>
-    </div>
-    <div style="display: flex;">
-      <div style="width: 130px; font-weight: bold; text-align: left;">operator</div>
-      <div style="text-align: left;">
-        → <code>==</code> | <code>!=</code> | <code>&lt;</code> | <code>&lt;=</code> |
-          <code>&gt;</code> | <code>&gt;=</code> | <code>+</code> |
-          <code>-</code> | <code>*</code> | <code>/</code> ;
-      </div>
-    </div>
-  </div>
-</div>
-
+| Nonterminal | Rule |
+|-------------|------|
+| expression  | → *equality* |
+| equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
+| comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
+| term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |
+| factor      | → *unary* ( ( `/` \| `*` ) *unary* )* ; |
+| unary       | → ( `!` \| `-` ) *unary* \| *primary* ; |
+| primary     | → **NUMBER** \| **STRING** \| `verdadeiro` \| `falso` \| `nulo` \| `(` *expression* `)` ; |
 
 ### Arithmetic
 
@@ -153,14 +132,6 @@ verdadeiro e verdadeiro; // true
 ```
 falso ou falso; // false
 verdadeiro ou falso; // true
-```
-
-### Precedence and grouping
-
-Both follow C behavior. You can change the precedence by using parentheses:
-
-```
-var c = (4 + 2) / 2;
 ```
 
 ## Statements
@@ -226,3 +197,7 @@ classe Person {
 	
 }
 ```
+
+---
+
+This work would not be possible without the help of the book *Crafting Interpreters* by Robert Nystrom.
