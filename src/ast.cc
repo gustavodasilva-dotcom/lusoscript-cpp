@@ -2,6 +2,18 @@
 
 #include <iostream>
 
+void throwIfBooleanHasNoValue(std::optional<bool> opt_bool) {
+  if (!opt_bool.has_value()) {
+    throw std::runtime_error("Expected boolean value.");
+  }
+}
+
+void throwIfLiteralHasNoValue(std::optional<std::string> opt_lit) {
+  if (!opt_lit.has_value()) {
+    throw std::runtime_error("Expected a literal value.");
+  }
+}
+
 std::string ast::AstPrinter::print(const Expr &expression) {
   struct ExprVisitor {
     AstPrinter &printer;
@@ -9,16 +21,14 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     void operator()(const Binary &binary) {
       printer.output_.append("(");
 
-      if (!binary.opr.lexeme.has_value()) {
-        std::cerr << "Expected a binary expression operator." << std::endl;
-        exit(EXIT_FAILURE);
-      }
-
-      printer.output_.append(binary.opr.lexeme.value());
+      printer.output_.append(binary.opr.lexeme.has_value()
+                                 ? binary.opr.lexeme.value()
+                                 : token::toString(binary.opr.type));
       printer.output_.append(" ");
       printer.print(*binary.left);
       printer.output_.append(" ");
       printer.print(*binary.right);
+
       printer.output_.append(")");
     }
 
@@ -31,22 +41,32 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     }
 
     void operator()(const Literal &literal) {
-      // TODO: for now, just string and floating-point numbers are being
-      // printed. Implement validation to check the literal type and print accordingly.
-      printer.output_.append(literal.str_num.value_or(token::KW_NULO));
+      std::string str;
+
+      if (literal.type == LiteralType::BOOLEAN) {
+        throwIfBooleanHasNoValue(literal.boolean);
+
+        str.append(literal.boolean.value() ? "true" : "false");
+      } else if (literal.type == LiteralType::NULO) {
+        str.append(token::KW_NULO);
+      } else {
+        throwIfLiteralHasNoValue(literal.str_num);
+
+        str.append(literal.str_num.value());
+      }
+
+      printer.output_.append(str);
     }
 
     void operator()(const Unary &unary) {
       printer.output_.append("(");
 
-      if (!unary.opr.lexeme.has_value()) {
-        std::cerr << "Expected a unary expression operator." << std::endl;
-        exit(EXIT_FAILURE);
-      }
-
-      printer.output_.append(unary.opr.lexeme.value());
+      printer.output_.append(unary.opr.lexeme.has_value()
+                                 ? unary.opr.lexeme.value()
+                                 : token::toString(unary.opr.type));
       printer.output_.append(" ");
       printer.print(*unary.right);
+
       printer.output_.append(")");
     }
   };

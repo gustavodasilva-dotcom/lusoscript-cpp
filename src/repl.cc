@@ -12,7 +12,7 @@ void Repl::run() {
 
   std::cout << "> ";
 
-  ErrorState error_state;
+  error::ErrorState error_state;
 
   while (std::getline(std::cin, input)) {
     interpreter.process(&error_state, std::move(input));

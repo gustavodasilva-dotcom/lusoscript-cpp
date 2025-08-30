@@ -1,6 +1,6 @@
 #include "lusoscript/lexer.hh"
 
-Lexer::Lexer(std::string source, ErrorState *error_state)
+Lexer::Lexer(std::string source, error::ErrorState *error_state)
     : source_(std::move(source)),
       error_state_(error_state),
       start_(0),

@@ -7,7 +7,7 @@
 
 class Interpreter {
  public:
-  void process(ErrorState *error_state, std::string source);
+  void process(error::ErrorState *error_state, std::string source);
 };
 
 #endif

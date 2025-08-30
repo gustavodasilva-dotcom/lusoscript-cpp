@@ -35,12 +35,13 @@ void SourceFile::run(std::string file_path) {
     file_content = contents_stream.str();
   }
 
-  ErrorState error_state;
+  error::ErrorState error_state;
 
   Interpreter interpreter;
   interpreter.process(&error_state, std::move(file_content));
 
   if (error_state.getHadError()) {
+    error_state.summary();
     exit(EX_DATAERR);
   }
 }

@@ -9,13 +9,13 @@
 
 class Lexer {
  public:
-  explicit Lexer(std::string source, ErrorState *error_state);
+  explicit Lexer(std::string source, error::ErrorState *error_state);
 
   std::vector<token::Token> scanTokens();
 
  private:
   std::string source_;
-  ErrorState *error_state_;
+  error::ErrorState *error_state_;
   std::vector<token::Token> tokens_;
   int start_;
   int current_;

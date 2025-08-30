@@ -2,98 +2,99 @@
 
 #include "cassert"
 
-std::string toString(token::TokenType token_type) {
+namespace token {
+std::string toString(TokenType token_type) {
   switch (token_type) {
-    case token::TokenType::KW_E:
-      return token::KW_E;
-    case token::TokenType::KW_CLASSE:
-      return token::KW_CLASSE;
-    case token::TokenType::KW_SENAO:
-      return token::KW_SENAO;
-    case token::TokenType::KW_FALSO:
-      return token::KW_FALSO;
-    case token::TokenType::KW_FUNCAO:
-      return token::KW_FUNCAO;
-    case token::TokenType::KW_PARA:
-      return token::KW_PARA;
-    case token::TokenType::KW_SE:
-      return token::KW_SE;
-    case token::TokenType::KW_NULO:
-      return token::KW_NULO;
-    case token::TokenType::KW_OU:
-      return token::KW_OU;
-    case token::TokenType::KW_IMPRIMA:
-      return token::KW_IMPRIMA;
-    case token::TokenType::KW_RETORNE:
-      return token::KW_RETORNE;
-    case token::TokenType::KW_SUPER:
-      return token::KW_SUPER;
-    case token::TokenType::KW_ESSE:
-      return token::KW_ESSE;
-    case token::TokenType::KW_VERDADEIRO:
-      return token::KW_VERDADEIRO;
-    case token::TokenType::KW_VAR:
-      return token::KW_VAR;
-    case token::TokenType::KW_ENQUANTO:
-      return token::KW_ENQUANTO;
-    case token::TokenType::SC_OPEN_PAREN:
-      return token::SC_OPEN_PAREN;
-    case token::TokenType::SC_CLOSE_PAREN:
-      return token::SC_CLOSE_PAREN;
-    case token::TokenType::SC_OPEN_CURLY:
-      return token::SC_OPEN_CURLY;
-    case token::TokenType::SC_CLOSE_CURLY:
-      return token::SC_CLOSE_CURLY;
-    case token::TokenType::SC_COMMA:
-      return token::SC_COMMA;
-    case token::TokenType::SC_DOT:
-      return token::SC_COMMA;
-    case token::TokenType::SC_MINUS:
-      return token::SC_MINUS;
-    case token::TokenType::SC_PLUS:
-      return token::SC_PLUS;
-    case token::TokenType::SC_SEMICOLON:
-      return token::SC_SEMICOLON;
-    case token::TokenType::SC_FORWARD_SLASH:
-      return token::SC_FORWARD_SLASH;
-    case token::TokenType::SC_STAR:
-      return token::SC_STAR;
-    case token::TokenType::MC_EXCL:
-      return token::MC_EXCL;
-    case token::TokenType::MC_EXCL_EQUAL:
-      return token::MC_EXCL_EQUAL;
-    case token::TokenType::MC_EQUAL:
-      return token::MC_EQUAL;
-    case token::TokenType::MC_EQUAL_EQUAL:
-      return token::MC_EQUAL_EQUAL;
-    case token::TokenType::MC_GREATER:
-      return token::MC_GREATER;
-    case token::TokenType::MC_GREATER_EQUAL:
-      return token::MC_GREATER_EQUAL;
-    case token::TokenType::MC_LESS:
-      return token::MC_LESS;
-    case token::TokenType::MC_LESS_EQUAL:
-      return token::MC_LESS_EQUAL;
-    case token::TokenType::LT_IDENTIFIER:
-      return token::LT_IDENTIFIER;
-    case token::TokenType::LT_STRING:
-      return token::LT_STRING;
-    case token::TokenType::LT_NUMBER:
-      return token::LT_NUMBER;
-    case token::TokenType::END_OF_FILE:
-      return token::END_OF_FILE;
+    case TokenType::KW_E:
+      return KW_E;
+    case TokenType::KW_CLASSE:
+      return KW_CLASSE;
+    case TokenType::KW_SENAO:
+      return KW_SENAO;
+    case TokenType::KW_FALSO:
+      return KW_FALSO;
+    case TokenType::KW_FUNCAO:
+      return KW_FUNCAO;
+    case TokenType::KW_PARA:
+      return KW_PARA;
+    case TokenType::KW_SE:
+      return KW_SE;
+    case TokenType::KW_NULO:
+      return KW_NULO;
+    case TokenType::KW_OU:
+      return KW_OU;
+    case TokenType::KW_IMPRIMA:
+      return KW_IMPRIMA;
+    case TokenType::KW_RETORNE:
+      return KW_RETORNE;
+    case TokenType::KW_SUPER:
+      return KW_SUPER;
+    case TokenType::KW_ESSE:
+      return KW_ESSE;
+    case TokenType::KW_VERDADEIRO:
+      return KW_VERDADEIRO;
+    case TokenType::KW_VAR:
+      return KW_VAR;
+    case TokenType::KW_ENQUANTO:
+      return KW_ENQUANTO;
+    case TokenType::SC_OPEN_PAREN:
+      return SC_OPEN_PAREN;
+    case TokenType::SC_CLOSE_PAREN:
+      return SC_CLOSE_PAREN;
+    case TokenType::SC_OPEN_CURLY:
+      return SC_OPEN_CURLY;
+    case TokenType::SC_CLOSE_CURLY:
+      return SC_CLOSE_CURLY;
+    case TokenType::SC_COMMA:
+      return SC_COMMA;
+    case TokenType::SC_DOT:
+      return SC_COMMA;
+    case TokenType::SC_MINUS:
+      return SC_MINUS;
+    case TokenType::SC_PLUS:
+      return SC_PLUS;
+    case TokenType::SC_SEMICOLON:
+      return SC_SEMICOLON;
+    case TokenType::SC_FORWARD_SLASH:
+      return SC_FORWARD_SLASH;
+    case TokenType::SC_STAR:
+      return SC_STAR;
+    case TokenType::MC_EXCL:
+      return MC_EXCL;
+    case TokenType::MC_EXCL_EQUAL:
+      return MC_EXCL_EQUAL;
+    case TokenType::MC_EQUAL:
+      return MC_EQUAL;
+    case TokenType::MC_EQUAL_EQUAL:
+      return MC_EQUAL_EQUAL;
+    case TokenType::MC_GREATER:
+      return MC_GREATER;
+    case TokenType::MC_GREATER_EQUAL:
+      return MC_GREATER_EQUAL;
+    case TokenType::MC_LESS:
+      return MC_LESS;
+    case TokenType::MC_LESS_EQUAL:
+      return MC_LESS_EQUAL;
+    case TokenType::LT_IDENTIFIER:
+      return LT_IDENTIFIER;
+    case TokenType::LT_STRING:
+      return LT_STRING;
+    case TokenType::LT_NUMBER:
+      return LT_NUMBER;
+    case TokenType::END_OF_FILE:
+      return END_OF_FILE;
     default:
       assert(0 && "Unmapped token type.");
   }
 }
 
-std::string token::Token::toString() {
+std::string Token::toString() {
   std::string output;
 
   if (lexeme.has_value() && !lexeme.value().empty()) {
-    output.append("[" + ::toString(type) + ":" + lexeme.value() + "]");
+    output.append("[" + token::toString(type) + ":" + lexeme.value() + "]");
   } else {
-    output.append("[" + ::toString(type) + "]");
+    output.append("[" + token::toString(type) + "]");
   }
 
   if (literal.has_value()) {
@@ -104,3 +105,4 @@ std::string token::Token::toString() {
 
   return output;
 }
+};  // namespace token

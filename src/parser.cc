@@ -1,14 +1,19 @@
 #include "lusoscript/parser.hh"
 
-#include <cassert>
-#include <stdexcept>
-
-Parser::Parser(arena::Arena *arena_allocator, ErrorState *error_state,
+Parser::Parser(arena::Arena *arena_allocator, error::ErrorState *error_state,
                std::vector<token::Token> tokens)
     : arena_allocator_(arena_allocator),
       error_state_(error_state),
       tokens_(std::move(tokens)),
       current_(0) {}
+
+ast::Expr Parser::parse() {
+  try {
+    return expression();
+  } catch (error::ParserError) {
+    return {};
+  }
+}
 
 ast::Expr Parser::expression() { return equality(); }
 
@@ -121,7 +126,7 @@ ast::Expr Parser::primary() {
   if (match({token::TokenType::SC_OPEN_PAREN})) {
     ast::Expr group_expr = expression();
 
-    consume(token::TokenType::SC_CLOSE_PAREN);
+    consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after expression.");
 
     auto grouping =
         arena_allocator_->make_unique<ast::Expr>(std::move(group_expr));
@@ -129,8 +134,7 @@ ast::Expr Parser::primary() {
     return ast::Expr{ast::Grouping{std::move(grouping)}};
   }
 
-  // TODO: create a customized error handler for syntax errors.
-  throw std::runtime_error("Invalid primary expression.");
+  throw error(peek(), "Expect expression.");
 }
 
 bool Parser::match(std::vector<token::TokenType> types) {
@@ -144,11 +148,9 @@ bool Parser::match(std::vector<token::TokenType> types) {
   return false;
 }
 
-token::Token Parser::consume(token::TokenType type) {
+token::Token Parser::consume(token::TokenType type, std::string message) {
   if (check(type)) return advance();
-
-  // TODO: create a customized error handler for syntax errors.
-  throw std::runtime_error("Expected token not found.");
+  throw error(peek(), message);
 }
 
 bool Parser::check(token::TokenType type) {
@@ -166,3 +168,30 @@ bool Parser::isAtEnd() { return peek().type == token::TokenType::END_OF_FILE; }
 token::Token Parser::peek() { return tokens_.at(current_); }
 
 token::Token Parser::previous() { return tokens_.at(current_ - 1); }
+
+error::ParserError Parser::error(token::Token token, std::string message) {
+  error_state_->error(token, message);
+  return error::ParserError(message);
+}
+
+void Parser::synchronize() {
+  advance();
+
+  while (!isAtEnd()) {
+    if (previous().type == token::TokenType::SC_SEMICOLON) return;
+
+    switch (peek().type) {
+      case token::TokenType::KW_CLASSE:
+      case token::TokenType::KW_FUNCAO:
+      case token::TokenType::KW_VAR:
+      case token::TokenType::KW_PARA:
+      case token::TokenType::KW_SE:
+      case token::TokenType::KW_ENQUANTO:
+      case token::TokenType::KW_IMPRIMA:
+      case token::TokenType::KW_RETORNE:
+        return;
+    }
+
+    advance();
+  }
+}
