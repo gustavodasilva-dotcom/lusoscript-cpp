@@ -59,6 +59,7 @@ The rules established by C are adhered to by LusoScript, as illustrated in the t
 | Term       | - +       | Left       |
 | Factor     | / *       | Left       |
 | Unary      | ! -       | Right      |
+
 _Extracted from "Crafting Interpreters" by Robert Nystrom_
 
 The precedence can be changed by using parentheses:

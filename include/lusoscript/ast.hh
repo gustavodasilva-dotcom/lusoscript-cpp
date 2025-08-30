@@ -4,11 +4,14 @@
 #include <memory>
 #include <variant>
 
+#include "arena.hh"
 #include "token.hh"
 
 namespace ast {
+enum class LiteralType { NUMBER_STRING, BOOLEAN, NULO };
+
 struct Expr;
-using ExprPtr = std::unique_ptr<Expr>;
+using ExprPtr = std::unique_ptr<Expr, arena::NoopDeleter<Expr>>;
 
 struct Binary {
   ExprPtr left;
@@ -21,7 +24,9 @@ struct Grouping {
 };
 
 struct Literal {
-  std::optional<std::string> value;
+  LiteralType type;
+  std::optional<bool> boolean;
+  std::optional<std::string> str_num;
 };
 
 struct Unary {

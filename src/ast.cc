@@ -31,7 +31,9 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     }
 
     void operator()(const Literal &literal) {
-      printer.output_.append(literal.value.value_or(token::KW_NULO));
+      // TODO: for now, just string and floating-point numbers are being
+      // printed. Implement validation to check the literal type and print accordingly.
+      printer.output_.append(literal.str_num.value_or(token::KW_NULO));
     }
 
     void operator()(const Unary &unary) {
