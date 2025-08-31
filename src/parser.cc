@@ -7,11 +7,11 @@ Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
       tokens_(std::move(tokens)),
       current_(0) {}
 
-ast::Expr Parser::parse() {
+std::optional<ast::Expr> Parser::parse() {
   try {
     return expression();
   } catch (error::ParserError) {
-    return {};
+    return std::nullopt;
   }
 }
 
@@ -20,10 +20,25 @@ ast::Expr Parser::expression() { return comma(); }
 ast::Expr Parser::comma() {
   const bool has_open_paren = match({token::TokenType::SC_OPEN_PAREN});
 
-  ast::Expr left_expr = ternary();
+  ast::Expr left_expr;
+
+  if (match({token::TokenType::SC_COMMA})) {
+    error_state_->error(previous(),
+                        "Binary operator ',' has no left-hand side.");
+
+    // Parses the right-hand side and discards it by not assigning it.
+    ast::Expr right_expr = ternary();
+
+    // Creates a placeholder for the invalid left-hand side expression (the spot
+    // before the dangling comma) and passes the right-hand side to it (metadata
+    // for later use).
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::Error{std::move(right)}};
+  }
 
   while (match({token::TokenType::SC_COMMA})) {
-    if (!has_open_paren) throw error(peek(), "Expected '(' before expression.");
+    if (!has_open_paren)
+      throw error(previous(), "Expected '(' before expression.");
 
     const token::Token opr = previous();
     ast::Expr right_expr = ternary();

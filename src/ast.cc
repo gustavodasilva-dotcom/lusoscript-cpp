@@ -85,6 +85,14 @@ std::string ast::AstPrinter::print(const Expr &expression) {
 
       printer.output_.append(")");
     }
+
+    void operator()(const Error &error) {
+      printer.output_.append("(");
+
+      printer.output_.append("error");
+
+      printer.output_.append(")");
+    }
   };
   ExprVisitor visitor{.printer = *this};
   std::visit(visitor, expression.var);

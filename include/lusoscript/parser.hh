@@ -14,7 +14,7 @@ class Parser {
   explicit Parser(arena::Arena *allocator, error::ErrorState *error_state,
                   std::vector<token::Token> tokens);
 
-  ast::Expr parse();
+  std::optional<ast::Expr> parse();
 
  private:
   ast::Expr expression();

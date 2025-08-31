@@ -42,8 +42,12 @@ struct Unary {
   ExprPtr right;
 };
 
+struct Error {
+  ExprPtr expr;
+};
+
 struct Expr {
-  std::variant<Ternary, Binary, Grouping, Literal, Unary> var;
+  std::variant<Ternary, Binary, Grouping, Literal, Unary, Error> var;
 };
 
 class AstPrinter {
