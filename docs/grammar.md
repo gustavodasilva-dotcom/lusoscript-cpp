@@ -76,7 +76,8 @@ LusoScript's formal grammar specification for _expressions_:
 | Nonterminal | Rule |
 |-------------|------|
 | expression  | → *comma* |
-| comma		  | → *equality* ( `,` *equality* )* ; |
+| comma		  | → *ternary* ( `,` *ternary* )* ; |
+| ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
 | equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
 | comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
 | term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |

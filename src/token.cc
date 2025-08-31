@@ -53,12 +53,16 @@ std::string toString(TokenType token_type) {
       return SC_MINUS;
     case TokenType::SC_PLUS:
       return SC_PLUS;
+    case TokenType::SC_COLON:
+      return SC_COLON;
     case TokenType::SC_SEMICOLON:
       return SC_SEMICOLON;
     case TokenType::SC_FORWARD_SLASH:
       return SC_FORWARD_SLASH;
     case TokenType::SC_STAR:
       return SC_STAR;
+    case TokenType::MC_QUESTION:
+      return MC_QUESTION;
     case TokenType::MC_EXCL:
       return MC_EXCL;
     case TokenType::MC_EXCL_EQUAL:

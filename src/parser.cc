@@ -20,13 +20,13 @@ ast::Expr Parser::expression() { return comma(); }
 ast::Expr Parser::comma() {
   const bool has_open_paren = match({token::TokenType::SC_OPEN_PAREN});
 
-  ast::Expr left_expr = equality();
+  ast::Expr left_expr = ternary();
 
   while (match({token::TokenType::SC_COMMA})) {
     if (!has_open_paren) throw error(peek(), "Expected '(' before expression.");
 
     const token::Token opr = previous();
-    ast::Expr right_expr = equality();
+    ast::Expr right_expr = ternary();
 
     auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
@@ -39,6 +39,30 @@ ast::Expr Parser::comma() {
   }
 
   return left_expr;
+}
+
+ast::Expr Parser::ternary() {
+  ast::Expr condition = equality();
+
+  if (match({token::TokenType::MC_QUESTION})) {
+    const auto question = previous();
+    ast::Expr then_expr = expression();
+
+    const auto colon =
+        consume(token::TokenType::SC_COLON, "Expected ':' after expression.");
+
+    ast::Expr else_expr = ternary();
+
+    auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
+    auto then_ptr = allocator_->make_unique<ast::Expr>(std::move(then_expr));
+    auto else_ptr = allocator_->make_unique<ast::Expr>(std::move(else_expr));
+
+    condition = ast::Expr{ast::Ternary{std::move(cond_ptr), question,
+                                       std::move(then_ptr), colon,
+                                       std::move(else_ptr)}};
+  }
+
+  return condition;
 }
 
 ast::Expr Parser::equality() {

@@ -18,6 +18,24 @@ std::string ast::AstPrinter::print(const Expr &expression) {
   struct ExprVisitor {
     AstPrinter &printer;
 
+    void operator()(const Ternary &ternary) {
+      printer.output_.append("(");
+
+      printer.output_.append("ternary");
+      printer.output_.append(" ");
+      printer.print(*ternary.condition);
+      printer.output_.append(" ");
+      printer.output_.append(token::toString(ternary.then_opr.type));
+      printer.output_.append(" ");
+      printer.print(*ternary.then_expr);
+      printer.output_.append(" ");
+      printer.output_.append(token::toString(ternary.else_opr.type));
+      printer.output_.append(" ");
+      printer.print(*ternary.else_expr);
+
+      printer.output_.append(")");
+    }
+
     void operator()(const Binary &binary) {
       printer.output_.append("(");
 
@@ -32,9 +50,11 @@ std::string ast::AstPrinter::print(const Expr &expression) {
 
     void operator()(const Grouping &grouping) {
       printer.output_.append("(");
+
       printer.output_.append("group");
       printer.output_.append(" ");
       printer.print(*grouping.expression);
+
       printer.output_.append(")");
     }
 

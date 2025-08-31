@@ -49,11 +49,17 @@ void Lexer::scanToken() {
     case '+':
       addToken(token::TokenType::SC_PLUS);
       break;
+    case ':':
+      addToken(token::TokenType::SC_COLON);
+      break;
     case ';':
       addToken(token::TokenType::SC_SEMICOLON);
       break;
     case '*':
       addToken(token::TokenType::SC_STAR);
+      break;
+    case '?':
+      addToken(token::TokenType::MC_QUESTION);
       break;
     case '!':
       addToken(match('=') ? token::TokenType::MC_EXCL_EQUAL

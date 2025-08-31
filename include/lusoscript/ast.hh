@@ -13,6 +13,14 @@ enum class LiteralType { NUMBER_STRING, BOOLEAN, NULO };
 struct Expr;
 using ExprPtr = std::unique_ptr<Expr, arena::NoopDeleter<Expr>>;
 
+struct Ternary {
+  ExprPtr condition;
+  token::Token then_opr;
+  ExprPtr then_expr;
+  token::Token else_opr;
+  ExprPtr else_expr;
+};
+
 struct Binary {
   ExprPtr left;
   token::Token opr;
@@ -35,7 +43,7 @@ struct Unary {
 };
 
 struct Expr {
-  std::variant<Binary, Grouping, Literal, Unary> var;
+  std::variant<Ternary, Binary, Grouping, Literal, Unary> var;
 };
 
 class AstPrinter {

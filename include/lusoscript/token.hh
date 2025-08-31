@@ -34,11 +34,13 @@ enum class TokenType {
   SC_DOT,
   SC_MINUS,
   SC_PLUS,
+  SC_COLON,
   SC_SEMICOLON,
   SC_FORWARD_SLASH,
   SC_STAR,
 
   // One or two character tokens
+  MC_QUESTION,
   MC_EXCL,
   MC_EXCL_EQUAL,
   MC_EQUAL,
@@ -80,9 +82,11 @@ const std::string SC_COMMA = ",";
 const std::string SC_DOT = ".";
 const std::string SC_MINUS = "-";
 const std::string SC_PLUS = "+";
+const std::string SC_COLON = ":";
 const std::string SC_SEMICOLON = ";";
 const std::string SC_FORWARD_SLASH = "/";
 const std::string SC_STAR = "*";
+const std::string MC_QUESTION = "?";
 const std::string MC_EXCL = "!";
 const std::string MC_EXCL_EQUAL = "!=";
 const std::string MC_EQUAL = "=";

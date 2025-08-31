@@ -19,6 +19,7 @@ class Parser {
  private:
   ast::Expr expression();
   ast::Expr comma();
+  ast::Expr ternary();
   ast::Expr equality();
   ast::Expr comparison();
   ast::Expr term();
