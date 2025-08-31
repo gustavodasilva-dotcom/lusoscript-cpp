@@ -22,7 +22,7 @@ ast::Expr Parser::comma() {
 
   ast::Expr left_expr;
 
-  // In case the expression starts with a comma operator...
+  // In case the expression starts with the binary comma operator...
   if (match({token::TokenType::SC_COMMA})) {
     error_state_->error(previous(),
                         "Binary operator ',' has no left-hand side.");
@@ -85,10 +85,27 @@ ast::Expr Parser::ternary() {
 }
 
 ast::Expr Parser::equality() {
-  ast::Expr left_expr = comparison();
+  const std::vector<token::TokenType> operators = {
+      token::TokenType::MC_EXCL_EQUAL, token::TokenType::MC_EQUAL_EQUAL};
 
-  while (match(
-      {token::TokenType::MC_EXCL_EQUAL, token::TokenType::MC_EQUAL_EQUAL})) {
+  ast::Expr left_expr;
+
+  // In case the expression starts with one of the binary equality operators...
+  if (match(operators)) {
+    const token::Token prev_token = previous();
+    error_state_->error(prev_token, "Binary operator '" +
+                                        token::toString(prev_token.type) +
+                                        "' has no left-hand side.");
+
+    ast::Expr right_expr = comparison();
+
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::Error{std::move(right)}};
+  } else {
+    left_expr = comparison();
+  }
+
+  while (match(operators)) {
     const token::Token opr = previous();
     ast::Expr right_expr = comparison();
 
@@ -102,11 +119,29 @@ ast::Expr Parser::equality() {
 }
 
 ast::Expr Parser::comparison() {
-  ast::Expr left_expr = term();
+  const std::vector<token::TokenType> operators = {
+      token::TokenType::MC_GREATER, token::TokenType::MC_GREATER_EQUAL,
+      token::TokenType::MC_LESS, token::TokenType::MC_LESS_EQUAL};
 
-  while (
-      match({token::TokenType::MC_GREATER, token::TokenType::MC_GREATER_EQUAL,
-             token::TokenType::MC_LESS, token::TokenType::MC_LESS_EQUAL})) {
+  ast::Expr left_expr;
+
+  // In case the expression starts with one of the binary comparison
+  // operators...
+  if (match(operators)) {
+    const token::Token prev_token = previous();
+    error_state_->error(prev_token, "Binary operator '" +
+                                        token::toString(prev_token.type) +
+                                        "' has no left-hand side.");
+
+    ast::Expr right_expr = term();
+
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::Error{{std::move(right)}}};
+  } else {
+    left_expr = term();
+  }
+
+  while (match(operators)) {
     const token::Token opr = previous();
     ast::Expr right_expr = term();
 
@@ -120,7 +155,22 @@ ast::Expr Parser::comparison() {
 }
 
 ast::Expr Parser::term() {
-  ast::Expr left_expr = factor();
+  ast::Expr left_expr;
+
+  // Only checks the binary arithmetic addition operator, because the
+  // subtraction operator is interpreted as a unary expression at the highest
+  // level.
+  if (match({token::TokenType::SC_PLUS})) {
+    error_state_->error(previous(),
+                        "Binary operator '+' has no left-hand side.");
+
+    ast::Expr right_expr = factor();
+
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::Error{{std::move(right)}}};
+  } else {
+    left_expr = factor();
+  }
 
   while (match({token::TokenType::SC_MINUS, token::TokenType::SC_PLUS})) {
     const token::Token opr = previous();
@@ -136,10 +186,28 @@ ast::Expr Parser::term() {
 }
 
 ast::Expr Parser::factor() {
-  ast::Expr left_expr = unary();
+  const std::vector<token::TokenType> operators = {
+      token::TokenType::SC_FORWARD_SLASH, token::TokenType::SC_STAR};
 
-  while (
-      match({token::TokenType::SC_FORWARD_SLASH, token::TokenType::SC_STAR})) {
+  ast::Expr left_expr;
+
+  // In case the expression starts with the binary arithmetic division or
+  // multiplication operators...
+  if (match(operators)) {
+    const token::Token prev_token = previous();
+    error_state_->error(prev_token, "Binary operator '" +
+                                        token::toString(prev_token.type) +
+                                        "' has no left-hand side.");
+
+    ast::Expr right_expr = unary();
+
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::Error{std::move(right)}};
+  } else {
+    left_expr = unary();
+  }
+
+  while (match(operators)) {
     const token::Token opr = previous();
     ast::Expr right_expr = unary();
 
