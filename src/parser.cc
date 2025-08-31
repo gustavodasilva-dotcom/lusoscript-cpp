@@ -158,7 +158,7 @@ ast::Expr Parser::term() {
   ast::Expr left_expr;
 
   // Only checks the binary arithmetic addition operator, because the
-  // subtraction operator is interpreted as a unary expression at the highest
+  // subtraction operator is parsed as a unary expression at the highest
   // level.
   if (match({token::TokenType::SC_PLUS})) {
     error_state_->error(previous(),
