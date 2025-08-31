@@ -22,6 +22,7 @@ ast::Expr Parser::comma() {
 
   ast::Expr left_expr;
 
+  // In case the expression starts with a comma operator...
   if (match({token::TokenType::SC_COMMA})) {
     error_state_->error(previous(),
                         "Binary operator ',' has no left-hand side.");
@@ -34,6 +35,9 @@ ast::Expr Parser::comma() {
     // for later use).
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
     left_expr = ast::Expr{ast::Error{std::move(right)}};
+  } else {
+    // Parse the ternary (descending) as usual.
+    left_expr = ternary();
   }
 
   while (match({token::TokenType::SC_COMMA})) {
