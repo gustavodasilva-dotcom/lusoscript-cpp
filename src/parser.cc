@@ -1,8 +1,8 @@
 #include "lusoscript/parser.hh"
 
-Parser::Parser(arena::Arena *arena_allocator, error::ErrorState *error_state,
+Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
                std::vector<token::Token> tokens)
-    : arena_allocator_(arena_allocator),
+    : allocator_(allocator),
       error_state_(error_state),
       tokens_(std::move(tokens)),
       current_(0) {}
@@ -15,19 +15,42 @@ ast::Expr Parser::parse() {
   }
 }
 
-ast::Expr Parser::expression() { return equality(); }
+ast::Expr Parser::expression() { return comma(); }
+
+ast::Expr Parser::comma() {
+  const bool has_open_paren = match({token::TokenType::SC_OPEN_PAREN});
+
+  ast::Expr left_expr = equality();
+
+  while (match({token::TokenType::SC_COMMA})) {
+    if (!has_open_paren) throw error(peek(), "Expected '(' before expression.");
+
+    const token::Token opr = previous();
+    ast::Expr right_expr = equality();
+
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+
+    left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
+  }
+
+  if (has_open_paren) {
+    consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after expression.");
+  }
+
+  return left_expr;
+}
 
 ast::Expr Parser::equality() {
   ast::Expr left_expr = comparison();
 
   while (match(
       {token::TokenType::MC_EXCL_EQUAL, token::TokenType::MC_EQUAL_EQUAL})) {
-    token::Token opr = previous();
+    const token::Token opr = previous();
     ast::Expr right_expr = comparison();
 
-    auto left = arena_allocator_->make_unique<ast::Expr>(std::move(left_expr));
-    auto right =
-        arena_allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
 
     left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
   }
@@ -41,12 +64,11 @@ ast::Expr Parser::comparison() {
   while (
       match({token::TokenType::MC_GREATER, token::TokenType::MC_GREATER_EQUAL,
              token::TokenType::MC_LESS, token::TokenType::MC_LESS_EQUAL})) {
-    token::Token opr = previous();
+    const token::Token opr = previous();
     ast::Expr right_expr = term();
 
-    auto left = arena_allocator_->make_unique<ast::Expr>(std::move(left_expr));
-    auto right =
-        arena_allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
 
     left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
   }
@@ -58,12 +80,11 @@ ast::Expr Parser::term() {
   ast::Expr left_expr = factor();
 
   while (match({token::TokenType::SC_MINUS, token::TokenType::SC_PLUS})) {
-    token::Token opr = previous();
+    const token::Token opr = previous();
     ast::Expr right_expr = factor();
 
-    auto left = arena_allocator_->make_unique<ast::Expr>(std::move(left_expr));
-    auto right =
-        arena_allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
 
     left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
   }
@@ -76,12 +97,11 @@ ast::Expr Parser::factor() {
 
   while (
       match({token::TokenType::SC_FORWARD_SLASH, token::TokenType::SC_STAR})) {
-    token::Token opr = previous();
+    const token::Token opr = previous();
     ast::Expr right_expr = unary();
 
-    auto left = arena_allocator_->make_unique<ast::Expr>(std::move(left_expr));
-    auto right =
-        arena_allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
 
     left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
   }
@@ -91,11 +111,10 @@ ast::Expr Parser::factor() {
 
 ast::Expr Parser::unary() {
   if (match({token::TokenType::MC_EXCL, token::TokenType::SC_MINUS})) {
-    token::Token opr = previous();
+    const token::Token opr = previous();
     ast::Expr right_operand = unary();
 
-    auto right =
-        arena_allocator_->make_unique<ast::Expr>(std::move(right_operand));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_operand));
 
     return ast::Expr{ast::Unary{opr, std::move(right)}};
   }
@@ -128,8 +147,7 @@ ast::Expr Parser::primary() {
 
     consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after expression.");
 
-    auto grouping =
-        arena_allocator_->make_unique<ast::Expr>(std::move(group_expr));
+    auto grouping = allocator_->make_unique<ast::Expr>(std::move(group_expr));
 
     return ast::Expr{ast::Grouping{std::move(grouping)}};
   }

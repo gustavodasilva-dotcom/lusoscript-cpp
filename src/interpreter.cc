@@ -10,9 +10,9 @@ void Interpreter::process(error::ErrorState *error_state, std::string source) {
   Lexer lexer(std::move(source), error_state);
   std::vector<token::Token> tokens = lexer.scanTokens();
 
-  arena::Arena arena_allocator(1024);
+  arena::Arena allocator(1024 * 1024 * 4);
 
-  Parser parser(&arena_allocator, error_state, tokens);
+  Parser parser(&allocator, error_state, tokens);
   ast::Expr expression = parser.parse();
 
   if (error_state->getHadError()) return;

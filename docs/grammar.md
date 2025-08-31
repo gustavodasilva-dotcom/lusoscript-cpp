@@ -50,10 +50,11 @@ var no_value = nulo;
 
 ### Precedence and associativity
 
-The rules established by C are adhered to by LusoScript, as illustrated in the table below, with equality having the lowest precedence and unary the highest:
+The rules established by C are adhered to by LusoScript, as illustrated in the table below, with comma having the lowest precedence and unary the highest:
 
 | Name       | Operators | Associates |
 |------------|-----------|------------|
+| Comma		 | ,		 | Left		  |
 | Equality   | == !=     | Left       |
 | Comparison | > >= < <= | Left       |
 | Term       | - +       | Left       |
@@ -74,7 +75,8 @@ LusoScript's formal grammar specification for _expressions_:
 
 | Nonterminal | Rule |
 |-------------|------|
-| expression  | → *equality* |
+| expression  | → *comma* |
+| comma		  | → *equality* ( `,` *equality* )* ; |
 | equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
 | comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
 | term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |

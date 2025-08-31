@@ -11,13 +11,14 @@
 
 class Parser {
  public:
-  explicit Parser(arena::Arena *arena_allocator, error::ErrorState *error_state,
+  explicit Parser(arena::Arena *allocator, error::ErrorState *error_state,
                   std::vector<token::Token> tokens);
 
   ast::Expr parse();
 
  private:
   ast::Expr expression();
+  ast::Expr comma();
   ast::Expr equality();
   ast::Expr comparison();
   ast::Expr term();
@@ -34,7 +35,7 @@ class Parser {
   error::ParserError error(token::Token token, std::string message);
   void synchronize();
 
-  arena::Arena *arena_allocator_;
+  arena::Arena *allocator_;
   error::ErrorState *error_state_;
   const std::vector<token::Token> tokens_;
   int current_;

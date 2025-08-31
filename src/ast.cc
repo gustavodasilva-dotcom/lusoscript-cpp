@@ -21,9 +21,7 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     void operator()(const Binary &binary) {
       printer.output_.append("(");
 
-      printer.output_.append(binary.opr.lexeme.has_value()
-                                 ? binary.opr.lexeme.value()
-                                 : token::toString(binary.opr.type));
+      printer.output_.append(token::toString(binary.opr.type));
       printer.output_.append(" ");
       printer.print(*binary.left);
       printer.output_.append(" ");
@@ -46,7 +44,7 @@ std::string ast::AstPrinter::print(const Expr &expression) {
       if (literal.type == LiteralType::BOOLEAN) {
         throwIfBooleanHasNoValue(literal.boolean);
 
-        str.append(literal.boolean.value() ? "true" : "false");
+        str.append(literal.boolean.value() == true ? "true" : "false");
       } else if (literal.type == LiteralType::NULO) {
         str.append(token::KW_NULO);
       } else {
@@ -61,9 +59,7 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     void operator()(const Unary &unary) {
       printer.output_.append("(");
 
-      printer.output_.append(unary.opr.lexeme.has_value()
-                                 ? unary.opr.lexeme.value()
-                                 : token::toString(unary.opr.type));
+      printer.output_.append(token::toString(unary.opr.type));
       printer.output_.append(" ");
       printer.print(*unary.right);
 
