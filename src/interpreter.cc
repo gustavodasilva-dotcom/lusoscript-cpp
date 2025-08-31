@@ -10,6 +10,7 @@ void Interpreter::process(error::ErrorState *error_state, std::string source) {
   Lexer lexer(std::move(source), error_state);
   std::vector<token::Token> tokens = lexer.scanTokens();
 
+  // Allocates 4 MB of memory for the arena.
   arena::Arena allocator(1024 * 1024 * 4);
 
   Parser parser(&allocator, error_state, tokens);
