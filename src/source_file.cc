@@ -44,4 +44,8 @@ void SourceFile::run(std::string file_path) {
     error_state.summary();
     exit(EX_DATAERR);
   }
+
+  if (error_state.getHadRuntimeError()) {
+    exit(EX_SOFTWARE);
+  }
 }

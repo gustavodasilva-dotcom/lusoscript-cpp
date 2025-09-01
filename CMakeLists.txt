@@ -8,6 +8,7 @@ add_library(lusoscript
 	src/ast.cc
 	src/driver.cc
 	src/error.cc
+	src/helper.cc
 	src/interpreter.cc
 	src/lexer.cc
 	src/parser.cc

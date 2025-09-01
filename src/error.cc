@@ -3,7 +3,10 @@
 #include <iostream>
 
 error::ErrorState::ErrorState()
-    : had_error_(false), error_count_(0), warning_count_(0) {}
+    : had_error_(false),
+      had_runtime_error_(false),
+      error_count_(0),
+      warning_count_(0) {}
 
 void error::ErrorState::error(int line, std::string message) {
   report(line, "", message);
@@ -22,7 +25,15 @@ void error::ErrorState::error(token::Token token, std::string message) {
   setHadError();
 }
 
+void error::ErrorState::runtimeError(const error::RuntimeError &error) {
+  std::cerr << "RuntimeError: " << error.what() << "\n\t on line "
+            << error.getToken().line << "." << std::endl;
+  had_runtime_error_ = true;
+}
+
 bool error::ErrorState::getHadError() { return had_error_; }
+
+bool error::ErrorState::getHadRuntimeError() { return had_runtime_error_; };
 
 void error::ErrorState::resetHadError() { had_error_ = false; }
 
@@ -43,9 +54,19 @@ void error::ErrorState::setHadError() {
   if (!had_error_) had_error_ = true;
 }
 
-error::ParserError::ParserError(const std::string& message)
-    : std::runtime_error(message) {}
+error::ParserError::ParserError(const std::string &message)
+    : std::runtime_error(message), message_(message) {}
 
-const char* error::ParserError::what() const noexcept {
+const char *error::ParserError::what() const noexcept {
   return message_.c_str();
 }
+
+error::RuntimeError::RuntimeError(const token::Token &token,
+                                  const std::string &message)
+    : std::runtime_error(message), message_(message), token_(token) {}
+
+const char *error::RuntimeError::what() const noexcept {
+  return message_.c_str();
+}
+
+token::Token error::RuntimeError::getToken() const { return token_; }

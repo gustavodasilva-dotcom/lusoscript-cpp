@@ -3,15 +3,32 @@
 #include <assert.h>
 
 #include <any>
+#include <iostream>
 
-void Interpreter::interpret(const ast::Expr &root) { evaluate(root); }
+#include "lusoscript/helper.hh"
+
+Interpreter::Interpreter(error::ErrorState *error_state)
+    : error_state_(error_state) {}
+
+void Interpreter::interpret(const ast::Expr &root) {
+  try {
+    const auto value = evaluate(root);
+    std::cout << stringify(value) << std::endl;
+  } catch (error::RuntimeError &error) {
+    error_state_->runtimeError(error);
+  }
+}
 
 std::any Interpreter::evaluate(const ast::Expr &expr) {
   struct AnyVisitor {
     Interpreter &interpreter;
 
     std::any operator()(const ast::Ternary &ternary) {
-      assert(false && "Overload not implemented.");
+      const std::any condition = interpreter.evaluate(*ternary.condition);
+
+      return interpreter.isTruthy(condition)
+                 ? interpreter.evaluate(*ternary.then_expr)
+                 : interpreter.evaluate(*ternary.else_expr);
     }
 
     std::any operator()(const ast::Binary &binary) {
@@ -20,6 +37,7 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
 
       switch (binary.opr.type) {
         case token::TokenType::SC_MINUS:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) - std::any_cast<float>(right);
         case token::TokenType::SC_PLUS:
           if (left.type() == typeid(float) && right.type() == typeid(float)) {
@@ -31,17 +49,28 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
             return std::any_cast<std::string>(left) +
                    std::any_cast<std::string>(right);
           }
+
+          throw error::RuntimeError(
+              binary.opr, "Operands must be two numbers or two strings");
+        case token::TokenType::SC_COMMA:
+          return right;
         case token::TokenType::SC_FORWARD_SLASH:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) / std::any_cast<float>(right);
         case token::TokenType::SC_STAR:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) * std::any_cast<float>(right);
         case token::TokenType::MC_GREATER:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) > std::any_cast<float>(right);
         case token::TokenType::MC_GREATER_EQUAL:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) >= std::any_cast<float>(right);
         case token::TokenType::MC_LESS:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) < std::any_cast<float>(right);
         case token::TokenType::MC_LESS_EQUAL:
+          interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) <= std::any_cast<float>(right);
         case token::TokenType::MC_EXCL_EQUAL:
           return !interpreter.isEqual(left, right);
@@ -49,8 +78,9 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
           return interpreter.isEqual(left, right);
       }
 
-      // TODO: Unreachable.
-      return nullptr;
+      throw error::RuntimeError(
+          binary.opr, "Binary operation '" + token::toString(binary.opr.type) +
+                          "' not supported.");
     }
 
     std::any operator()(const ast::Grouping &grouping) {
@@ -64,13 +94,15 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
 
       switch (unary.opr.type) {
         case token::TokenType::MC_EXCL:
-          return interpreter.isTruthy(right);
+          return !interpreter.isTruthy(right);
         case token::TokenType::SC_MINUS:
+          interpreter.checkNumberOperand(unary.opr, right);
           return -std::any_cast<float>(right);
       }
 
-      // TODO: Unreachable.
-      return nullptr;
+      throw error::RuntimeError(unary.opr, "Unary operation '" +
+                                               token::toString(unary.opr.type) +
+                                               "' not supported.");
     }
 
     std::any operator()(const ast::Error &error) {
@@ -79,6 +111,26 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
   };
   AnyVisitor visitor{.interpreter = *this};
   return std::visit(visitor, expr.var);
+}
+
+std::string Interpreter::stringify(const std::any &value) {
+  if (value.type() == typeid(nullptr)) return token::KW_NULO;
+
+  if (value.type() == typeid(float)) {
+    auto text = std::to_string(std::any_cast<float>(value));
+
+    if (helper::endsWith(text, ".000000")) {
+      text = text.substr(0, text.length() - 7);
+    }
+
+    return text;
+  }
+
+  if (value.type() == typeid(bool)) {
+    return std::to_string(std::any_cast<bool>(value));
+  }
+
+  return std::any_cast<std::string>(value);
 }
 
 bool Interpreter::isTruthy(std::any value) {
@@ -93,4 +145,15 @@ bool Interpreter::isEqual(std::any a, std::any b) {
 
   // TODO: implement comparison.
   assert(false && "Comparison not implemented.");
+}
+
+void Interpreter::checkNumberOperand(token::Token opr, std::any value) {
+  if (value.type() == typeid(float)) return;
+  throw error::RuntimeError(opr, "Operand must be a number");
+}
+
+void Interpreter::checkNumberOperands(token::Token opr, std::any left,
+                                      std::any right) {
+  if (left.type() == typeid(float) && right.type() == typeid(float)) return;
+  throw error::RuntimeError(opr, "Operands must be numbers");
 }

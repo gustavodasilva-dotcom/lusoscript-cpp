@@ -7,11 +7,11 @@ Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
       tokens_(std::move(tokens)),
       current_(0) {}
 
-std::optional<ast::Expr> Parser::parse() {
+ast::Expr Parser::parse() {
   try {
     return expression();
   } catch (error::ParserError) {
-    return std::nullopt;
+    return {};
   }
 }
 
