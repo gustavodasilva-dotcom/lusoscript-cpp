@@ -2,11 +2,11 @@
 
 #include <iostream>
 
+#include "lusoscript/driver.hh"
 #include "lusoscript/error.hh"
-#include "lusoscript/interpreter.hh"
 
 void Repl::run() {
-  Interpreter interpreter;
+  Driver driver;
 
   std::string input;
 
@@ -15,7 +15,7 @@ void Repl::run() {
   error::ErrorState error_state;
 
   while (std::getline(std::cin, input)) {
-    interpreter.process(&error_state, std::move(input));
+    driver.process(&error_state, std::move(input));
 
     error_state.resetHadError();
 

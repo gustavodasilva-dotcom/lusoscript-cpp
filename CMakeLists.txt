@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_library(lusoscript
 	src/arena.cc
 	src/ast.cc
+	src/driver.cc
 	src/error.cc
-	src/interpreter.cc
 	src/lexer.cc
 	src/parser.cc
 	src/repl.cc

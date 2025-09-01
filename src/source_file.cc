@@ -6,8 +6,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "lusoscript/driver.hh"
 #include "lusoscript/error.hh"
-#include "lusoscript/interpreter.hh"
 
 void SourceFile::run(std::string file_path) {
   std::filesystem::path path = file_path;
@@ -37,8 +37,8 @@ void SourceFile::run(std::string file_path) {
 
   error::ErrorState error_state;
 
-  Interpreter interpreter;
-  interpreter.process(&error_state, std::move(file_content));
+  Driver driver;
+  driver.process(&error_state, std::move(file_content));
 
   if (error_state.getHadError()) {
     error_state.summary();

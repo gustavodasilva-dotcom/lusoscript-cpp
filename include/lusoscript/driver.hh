@@ -1,11 +1,11 @@
-#ifndef LUSOSCRIPT_INTERPRETER_H
-#define LUSOSCRIPT_INTERPRETER_H
+#ifndef LUSOSCRIPT_DRIVER_H
+#define LUSOSCRIPT_DRIVER_H
 
 #include <string>
 
 #include "error.hh"
 
-class Interpreter {
+class Driver {
  public:
   void process(error::ErrorState *error_state, std::string source);
 };

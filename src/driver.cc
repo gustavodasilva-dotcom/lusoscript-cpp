@@ -1,4 +1,4 @@
-#include "lusoscript/interpreter.hh"
+#include "lusoscript/driver.hh"
 
 #include <iostream>
 
@@ -6,7 +6,7 @@
 #include "lusoscript/lexer.hh"
 #include "lusoscript/parser.hh"
 
-void Interpreter::process(error::ErrorState *error_state, std::string source) {
+void Driver::process(error::ErrorState *error_state, std::string source) {
   Lexer lexer(std::move(source), error_state);
   std::vector<token::Token> tokens = lexer.scanTokens();
 
