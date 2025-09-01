@@ -37,6 +37,8 @@ bool error::ErrorState::getHadRuntimeError() { return had_runtime_error_; };
 
 void error::ErrorState::resetHadError() { had_error_ = false; }
 
+void error::ErrorState::resetHadRuntimeError() { had_runtime_error_ = false; }
+
 void error::ErrorState::summary() {
   std::cout << std::string(48, '-') << std::endl;
   std::cout << "Errors: " << error_count_ << std::endl;

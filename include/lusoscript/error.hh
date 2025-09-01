@@ -19,6 +19,7 @@ class ErrorState {
   [[nodiscard]] bool getHadError();
   [[nodiscard]] bool getHadRuntimeError();
   void resetHadError();
+  void resetHadRuntimeError();
   void summary();
 
  private:

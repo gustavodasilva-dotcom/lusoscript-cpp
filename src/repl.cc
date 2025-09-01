@@ -18,6 +18,7 @@ void Repl::run() {
     driver.process(&error_state, std::move(input));
 
     error_state.resetHadError();
+    error_state.resetHadRuntimeError();
 
     std::cout << "> ";
   }
