@@ -243,7 +243,7 @@ ast::Expr Parser::primary() {
   }
 
   if (match({token::TokenType::KW_NULO})) {
-    return ast::Expr{ast::Literal{previous().type, {}}};
+    return ast::Expr{ast::Literal{previous().type, nullptr}};
   }
 
   if (match({token::TokenType::LT_NUMBER, token::TokenType::LT_STRING})) {

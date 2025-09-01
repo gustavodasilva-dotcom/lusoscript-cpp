@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "lusoscript/arena.hh"
+#include "lusoscript/interpreter.hh"
 #include "lusoscript/lexer.hh"
 #include "lusoscript/parser.hh"
 
@@ -23,4 +24,7 @@ void Driver::process(error::ErrorState *error_state, std::string source) {
 
   ast::AstPrinter printer;
   std::cout << printer.print(std::move(expression.value())) << std::endl;
+
+  Interpreter interpreter;
+  interpreter.interpret(std::move(expression.value()));
 }
