@@ -127,7 +127,7 @@ std::string Interpreter::stringify(const std::any &value) {
   }
 
   if (value.type() == typeid(bool)) {
-    return std::to_string(std::any_cast<bool>(value));
+    return std::any_cast<bool>(value) ? token::KW_VERDADEIRO : token::KW_FALSO;
   }
 
   return std::any_cast<std::string>(value);
@@ -140,11 +140,21 @@ bool Interpreter::isTruthy(std::any value) {
 }
 
 bool Interpreter::isEqual(std::any a, std::any b) {
+  // Strict equality comparison.
   if (a.type() == typeid(nullptr) && b.type() == typeid(nullptr)) return true;
   if (a.type() == typeid(nullptr)) return false;
+  if (a.type() == typeid(std::string) && b.type() == typeid(std::string)) {
+    return std::any_cast<std::string>(a) == std::any_cast<std::string>(b);
+  }
+  if (a.type() == typeid(bool) && b.type() == typeid(bool)) {
+    return std::any_cast<bool>(a) == std::any_cast<bool>(b);
+  }
+  if (a.type() == typeid(float) && b.type() == typeid(float)) {
+    return std::any_cast<float>(a) == std::any_cast<float>(b);
+  }
 
-  // TODO: implement comparison.
-  assert(false && "Comparison not implemented.");
+  // Loose equality comparison (type coercion) is false.
+  return false;
 }
 
 void Interpreter::checkNumberOperand(token::Token opr, std::any value) {
