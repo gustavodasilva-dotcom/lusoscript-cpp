@@ -142,7 +142,6 @@ bool Interpreter::isTruthy(std::any value) {
 bool Interpreter::isEqual(std::any a, std::any b) {
   // Strict equality comparison.
   if (a.type() == typeid(nullptr) && b.type() == typeid(nullptr)) return true;
-  if (a.type() == typeid(nullptr)) return false;
   if (a.type() == typeid(std::string) && b.type() == typeid(std::string)) {
     return std::any_cast<std::string>(a) == std::any_cast<std::string>(b);
   }
