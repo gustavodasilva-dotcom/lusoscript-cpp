@@ -34,7 +34,7 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
         case token::TokenType::SC_FORWARD_SLASH:
           return std::any_cast<float>(left) / std::any_cast<float>(right);
         case token::TokenType::SC_STAR:
-          return std::any_cast<float>(left) / std::any_cast<float>(right);
+          return std::any_cast<float>(left) * std::any_cast<float>(right);
         case token::TokenType::MC_GREATER:
           return std::any_cast<float>(left) > std::any_cast<float>(right);
         case token::TokenType::MC_GREATER_EQUAL:
@@ -78,7 +78,7 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
     }
   };
   AnyVisitor visitor{.interpreter = *this};
-  std::visit(visitor, expr.var);
+  return std::visit(visitor, expr.var);
 }
 
 bool Interpreter::isTruthy(std::any value) {
