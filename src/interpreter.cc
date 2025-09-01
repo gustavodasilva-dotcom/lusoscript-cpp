@@ -61,17 +61,57 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
           interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) * std::any_cast<float>(right);
         case token::TokenType::MC_GREATER:
-          interpreter.checkNumberOperands(binary.opr, left, right);
-          return std::any_cast<float>(left) > std::any_cast<float>(right);
+          if (left.type() == typeid(float) && right.type() == typeid(float)) {
+            return std::any_cast<float>(left) > std::any_cast<float>(right);
+          }
+
+          if (left.type() == typeid(std::string) &&
+              right.type() == typeid(std::string)) {
+            return std::any_cast<std::string>(left) >
+                   std::any_cast<std::string>(right);
+          }
+
+          throw error::RuntimeError(
+              binary.opr, "Operands must be two numbers or two strings");
         case token::TokenType::MC_GREATER_EQUAL:
-          interpreter.checkNumberOperands(binary.opr, left, right);
-          return std::any_cast<float>(left) >= std::any_cast<float>(right);
+          if (left.type() == typeid(float) && right.type() == typeid(float)) {
+            return std::any_cast<float>(left) >= std::any_cast<float>(right);
+          }
+
+          if (left.type() == typeid(std::string) &&
+              right.type() == typeid(std::string)) {
+            return std::any_cast<std::string>(left) >=
+                   std::any_cast<std::string>(right);
+          }
+
+          throw error::RuntimeError(
+              binary.opr, "Operands must be two numbers or two strings");
         case token::TokenType::MC_LESS:
-          interpreter.checkNumberOperands(binary.opr, left, right);
-          return std::any_cast<float>(left) < std::any_cast<float>(right);
+          if (left.type() == typeid(float) && right.type() == typeid(float)) {
+            return std::any_cast<float>(left) < std::any_cast<float>(right);
+          }
+
+          if (left.type() == typeid(std::string) &&
+              right.type() == typeid(std::string)) {
+            return std::any_cast<std::string>(left) <
+                   std::any_cast<std::string>(right);
+          }
+
+          throw error::RuntimeError(
+              binary.opr, "Operands must be two numbers or two strings");
         case token::TokenType::MC_LESS_EQUAL:
-          interpreter.checkNumberOperands(binary.opr, left, right);
-          return std::any_cast<float>(left) <= std::any_cast<float>(right);
+          if (left.type() == typeid(float) && right.type() == typeid(float)) {
+            return std::any_cast<float>(left) <= std::any_cast<float>(right);
+          }
+
+          if (left.type() == typeid(std::string) &&
+              right.type() == typeid(std::string)) {
+            return std::any_cast<std::string>(left) <=
+                   std::any_cast<std::string>(right);
+          }
+
+          throw error::RuntimeError(
+              binary.opr, "Operands must be two numbers or two strings");
         case token::TokenType::MC_EXCL_EQUAL:
           return !interpreter.isEqual(left, right);
         case token::TokenType::MC_EQUAL_EQUAL:
