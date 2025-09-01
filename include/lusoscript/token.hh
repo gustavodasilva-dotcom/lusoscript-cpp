@@ -1,6 +1,7 @@
 #ifndef LUSOSCRIPT_TOKEN_H
 #define LUSOSCRIPT_TOKEN_H
 
+#include <any>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -124,7 +125,7 @@ class Token {
  public:
   TokenType type;
   std::optional<std::string> lexeme;
-  std::optional<std::string> literal;
+  std::any literal;
   int line;
 
   std::string toString();

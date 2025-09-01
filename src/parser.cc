@@ -235,22 +235,19 @@ ast::Expr Parser::unary() {
 
 ast::Expr Parser::primary() {
   if (match({token::TokenType::KW_FALSO})) {
-    return ast::Expr{
-        ast::Literal{.type = ast::LiteralType::BOOLEAN, .boolean = false}};
+    return ast::Expr{ast::Literal{previous().type, false}};
   }
 
   if (match({token::TokenType::KW_VERDADEIRO})) {
-    return ast::Expr{
-        ast::Literal{.type = ast::LiteralType::BOOLEAN, .boolean = true}};
+    return ast::Expr{ast::Literal{previous().type, true}};
   }
 
   if (match({token::TokenType::KW_NULO})) {
-    return ast::Expr{ast::Literal{ast::LiteralType::NULO}};
+    return ast::Expr{ast::Literal{previous().type, {}}};
   }
 
   if (match({token::TokenType::LT_NUMBER, token::TokenType::LT_STRING})) {
-    return ast::Expr{ast::Literal{.type = ast::LiteralType::NUMBER_STRING,
-                                  .str_num = previous().literal}};
+    return ast::Expr{ast::Literal{previous().type, previous().literal}};
   }
 
   if (match({token::TokenType::SC_OPEN_PAREN})) {

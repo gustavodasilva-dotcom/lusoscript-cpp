@@ -162,7 +162,7 @@ void Lexer::scanNumber() {
   }
 
   std::string value = source_.substr(start_, current_ - start_);
-  addToken(token::TokenType::LT_NUMBER, value);
+  addToken(token::TokenType::LT_NUMBER, std::stof(value));
 }
 
 void Lexer::scanIdentifier() {
@@ -222,7 +222,7 @@ void Lexer::addToken(token::TokenType token_type) {
   tokens_.push_back({.type = token_type, .line = line_});
 }
 
-void Lexer::addToken(token::TokenType token_type, std::string literal) {
+void Lexer::addToken(token::TokenType token_type, std::any literal) {
   std::string lexeme = source_.substr(start_, current_ - start_);
   tokens_.push_back({token_type, lexeme, literal, line_});
 }

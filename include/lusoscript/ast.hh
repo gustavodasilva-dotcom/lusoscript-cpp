@@ -8,9 +8,8 @@
 #include "token.hh"
 
 namespace ast {
-enum class LiteralType { NUMBER_STRING, BOOLEAN, NULO };
-
 struct Expr;
+
 using ExprPtr = std::unique_ptr<Expr, arena::NoopDeleter<Expr>>;
 
 struct Ternary {
@@ -32,9 +31,8 @@ struct Grouping {
 };
 
 struct Literal {
-  LiteralType type;
-  std::optional<bool> boolean;
-  std::optional<std::string> str_num;
+  token::TokenType token_type;
+  std::any value;
 };
 
 struct Unary {

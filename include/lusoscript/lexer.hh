@@ -35,7 +35,7 @@ class Lexer {
   char peekNext();
   bool match(char expected);
   void addToken(token::TokenType token_type);
-  void addToken(token::TokenType token_type, std::string literal);
+  void addToken(token::TokenType token_type, std::any literal);
 };
 
 #endif

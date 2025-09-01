@@ -1,5 +1,7 @@
 #include "lusoscript/token.hh"
 
+#include <iostream>
+
 #include "cassert"
 
 namespace token {
@@ -101,9 +103,23 @@ std::string Token::toString() {
     output.append("[" + token::toString(type) + "]");
   }
 
-  if (literal.has_value()) {
-    output.append(" (literal:" + literal.value() + ")");
-  }
+  // The default statement is omitted to indicate that it is not a literal if it
+  // does not fall into any of the clauses.
+  switch (type) {
+    case token::TokenType::LT_NUMBER:
+      output.append(
+          " (literal:" + std::to_string(std::any_cast<float>(literal)) + ")");
+      break;
+    case token::TokenType::LT_STRING:
+      output.append(" (literal:" + std::any_cast<std::string>(literal) + ")");
+      break;
+    case token::TokenType::KW_VERDADEIRO:
+      output.append(" (literal:" + token::KW_VERDADEIRO + ")");
+      break;
+    case token::TokenType::KW_FALSO:
+      output.append(" (literal:" + token::KW_FALSO + ")");
+      break;
+  };
 
   output.append(" (line " + std::to_string(line) + ")");
 

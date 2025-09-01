@@ -59,21 +59,23 @@ std::string ast::AstPrinter::print(const Expr &expression) {
     }
 
     void operator()(const Literal &literal) {
-      std::string str;
-
-      if (literal.type == LiteralType::BOOLEAN) {
-        throwIfBooleanHasNoValue(literal.boolean);
-
-        str.append(literal.boolean.value() == true ? "true" : "false");
-      } else if (literal.type == LiteralType::NULO) {
-        str.append(token::KW_NULO);
-      } else {
-        throwIfLiteralHasNoValue(literal.str_num);
-
-        str.append(literal.str_num.value());
-      }
-
-      printer.output_.append(str);
+      switch (literal.token_type) {
+        case token::TokenType::LT_NUMBER:
+          printer.output_.append(
+              std::to_string(std::any_cast<float>(literal.value)));
+          break;
+        case token::TokenType::LT_STRING:
+          printer.output_.append(std::any_cast<std::string>(literal.value));
+          break;
+        case token::TokenType::KW_VERDADEIRO:
+          printer.output_.append(token::KW_VERDADEIRO);
+          break;
+        case token::TokenType::KW_FALSO:
+          printer.output_.append(token::KW_FALSO);
+          break;
+        default:
+          throw std::runtime_error("Literal type cast not implemented.");
+      };
     }
 
     void operator()(const Unary &unary) {
