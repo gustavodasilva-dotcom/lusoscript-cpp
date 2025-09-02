@@ -47,9 +47,15 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
           }
         case token::TokenType::SC_COMMA:
           return right;
-        case token::TokenType::SC_FORWARD_SLASH:
+        case token::TokenType::SC_FORWARD_SLASH: {
           interpreter.checkNumberOperands(binary.opr, left, right);
-          return std::any_cast<float>(left) / std::any_cast<float>(right);
+          const float divisor = std::any_cast<float>(right);
+          if (divisor == 0.f) {
+            throw error::RuntimeError(binary.opr,
+                                      "Attempted to divide by zero");
+          }
+          return std::any_cast<float>(left) / divisor;
+        }
         case token::TokenType::SC_STAR:
           interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) * std::any_cast<float>(right);
