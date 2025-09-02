@@ -1,6 +1,9 @@
 #ifndef LUSOSCRIPT_INTERPRETER_H
 #define LUSOSCRIPT_INTERPRETER_H
 
+#include <any>
+#include <vector>
+
 #include "ast.hh"
 #include "error.hh"
 
@@ -8,11 +11,12 @@ class Interpreter {
  public:
   explicit Interpreter(error::ErrorState *error_state);
 
-  void interpret(const ast::Expr &root);
+  void interpret(const std::vector<ast::Stmt> &stmts);
 
  private:
   error::ErrorState *error_state_;
 
+  void execute(const ast::Stmt &stmt);
   std::any evaluate(const ast::Expr &expr);
   std::string stringify(const std::any &value);
   bool isTruthy(std::any value);

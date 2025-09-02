@@ -1,0 +1,5 @@
+imprima("Olá, mundo!"); // "Hello world" in Portuguese
+
+imprima(1 + 1);
+
+imprima(verdadeiro);

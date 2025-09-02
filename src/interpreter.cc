@@ -2,7 +2,6 @@
 
 #include <assert.h>
 
-#include <any>
 #include <iostream>
 
 #include "lusoscript/helper.hh"
@@ -10,13 +9,31 @@
 Interpreter::Interpreter(error::ErrorState *error_state)
     : error_state_(error_state) {}
 
-void Interpreter::interpret(const ast::Expr &root) {
+void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
   try {
-    const auto value = evaluate(root);
-    std::cout << stringify(value) << std::endl;
+    for (const ast::Stmt &stmt : stmts) {
+      execute(stmt);
+    }
   } catch (error::RuntimeError &error) {
     error_state_->runtimeError(error);
   }
+}
+
+void Interpreter::execute(const ast::Stmt &stmt) {
+  struct VoidVisitor {
+    Interpreter &interpreter;
+
+    void operator()(const ast::Expression &expression) {
+      interpreter.evaluate(*expression.expression);
+    };
+
+    void operator()(const ast::Imprima &imprima) {
+      const std::any value = interpreter.evaluate(*imprima.expression);
+      std::cout << interpreter.stringify(value) << std::endl;
+    }
+  };
+  VoidVisitor visitor{.interpreter = *this};
+  std::visit(visitor, stmt.var);
 }
 
 std::any Interpreter::evaluate(const ast::Expr &expr) {

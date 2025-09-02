@@ -2,6 +2,28 @@
 
 The work on this document is ongoing. Even though it's a mess now, things will get better.
 
+---
+
+LusoScript's formal grammar specification is as follows:
+
+| Nonterminal | Rule |
+|-------------|------|
+| program	  | → *statement** **EOF** ; |
+| statement	  | → *exprStmt* \| *imprimaStmt* ; |
+| exprStmt	  | → *expression* `;` ; |
+| imprimaStmt | → `"imprima"` + `"("` + *expression* + `")"` `;` ; |
+| expression  | → *comma* ; |
+| comma		  | → *ternary* ( `,` *ternary* )* ; |
+| ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
+| equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
+| comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
+| term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |
+| factor      | → *unary* ( ( `/` \| `*` ) *unary* )* ; |
+| unary       | → ( `!` \| `-` ) *unary* \| *primary* ; |
+| primary     | → **NUMBER** \| **STRING** \| `verdadeiro` \| `falso` \| `nulo` \| `(` *expression* `)` ; |
+
+## Comments
+
 LusoScript supports multiline strings:
 
 ```
@@ -70,20 +92,6 @@ var c = (4 + 2) / 2;
 ```
 
 ## Expressions
-
-LusoScript's formal grammar specification for _expressions_:
-
-| Nonterminal | Rule |
-|-------------|------|
-| expression  | → *comma* |
-| comma		  | → *ternary* ( `,` *ternary* )* ; |
-| ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
-| equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
-| comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
-| term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |
-| factor      | → *unary* ( ( `/` \| `*` ) *unary* )* ; |
-| unary       | → ( `!` \| `-` ) *unary* \| *primary* ; |
-| primary     | → **NUMBER** \| **STRING** \| `verdadeiro` \| `falso` \| `nulo` \| `(` *expression* `)` ; |
 
 ### Arithmetic
 

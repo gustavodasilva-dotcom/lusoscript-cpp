@@ -9,8 +9,10 @@
 
 namespace ast {
 struct Expr;
+struct Stmt;
 
 using ExprPtr = std::unique_ptr<Expr, arena::NoopDeleter<Expr>>;
+using StmtPtr = std::unique_ptr<Stmt, arena::NoopDeleter<Stmt>>;
 
 struct Ternary {
   ExprPtr condition;
@@ -46,6 +48,18 @@ struct Error {
 
 struct Expr {
   std::variant<Ternary, Binary, Grouping, Literal, Unary, Error> var;
+};
+
+struct Expression {
+  ExprPtr expression;
+};
+
+struct Imprima {
+  ExprPtr expression;
+};
+
+struct Stmt {
+  std::variant<Expression, Imprima> var;
 };
 
 class AstPrinter {

@@ -15,10 +15,10 @@ void Driver::process(error::ErrorState *error_state, std::string source) {
   arena::Arena allocator(1024 * 1024 * 4);
 
   Parser parser(&allocator, error_state, tokens);
-  const auto expression = parser.parse();
+  const auto statements = parser.parse();
 
   if (!error_state->getHadError()) {
     Interpreter interpreter{error_state};
-    interpreter.interpret(std::move(expression));
+    interpreter.interpret(statements);
   }
 }

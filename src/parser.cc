@@ -23,12 +23,46 @@ Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
       tokens_(std::move(tokens)),
       current_(0) {}
 
-ast::Expr Parser::parse() {
-  try {
-    return expression();
-  } catch (error::ParserError) {
-    return {};
+std::vector<ast::Stmt> Parser::parse() {
+  std::vector<ast::Stmt> statements;
+
+  while (!isAtEnd()) {
+    try {
+      statements.push_back(statement());
+    } catch (error::ParserError) {
+      synchronize();
+    }
   }
+
+  return statements;
+}
+
+ast::Stmt Parser::statement() {
+  if (match({token::TokenType::KW_IMPRIMA})) return imprimaStatement();
+
+  return expressionStatement();
+}
+
+ast::Stmt Parser::imprimaStatement() {
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected '(' before value.");
+
+  ast::Expr value = expression();
+
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after value.");
+  consume(token::TokenType::SC_SEMICOLON,
+          "Expected ';' after closing the parentheses.");
+
+  auto value_ptr = allocator_->make_unique<ast::Expr>(std::move(value));
+  return ast::Stmt{ast::Imprima{std::move(value_ptr)}};
+}
+
+ast::Stmt Parser::expressionStatement() {
+  ast::Expr expr = expression();
+
+  consume(token::TokenType::SC_SEMICOLON, "Expected ';' after expression.");
+
+  auto expr_ptr = allocator_->make_unique<ast::Expr>(std::move(expr));
+  return ast::Stmt{ast::Expression{std::move(expr_ptr)}};
 }
 
 ast::Expr Parser::expression() { return comma(); }

@@ -14,9 +14,12 @@ class Parser {
   explicit Parser(arena::Arena *allocator, error::ErrorState *error_state,
                   std::vector<token::Token> tokens);
 
-  ast::Expr parse();
+  std::vector<ast::Stmt> parse();
 
  private:
+  ast::Stmt statement();
+  ast::Stmt imprimaStatement();
+  ast::Stmt expressionStatement();
   ast::Expr expression();
   ast::Expr comma();
   ast::Expr ternary();
