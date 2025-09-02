@@ -40,18 +40,11 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
           interpreter.checkNumberOperands(binary.opr, left, right);
           return std::any_cast<float>(left) - std::any_cast<float>(right);
         case token::TokenType::SC_PLUS:
-          if (left.type() == typeid(float) && right.type() == typeid(float)) {
-            return std::any_cast<float>(left) + std::any_cast<float>(right);
+          if (left.type() == right.type()) {
+            return interpreter.combineStrict(binary.opr, left, right);
+          } else {
+            return interpreter.combineLoose(binary.opr, left, right);
           }
-
-          if (left.type() == typeid(std::string) &&
-              right.type() == typeid(std::string)) {
-            return std::any_cast<std::string>(left) +
-                   std::any_cast<std::string>(right);
-          }
-
-          throw error::RuntimeError(
-              binary.opr, "Operands must be two numbers or two strings");
         case token::TokenType::SC_COMMA:
           return right;
         case token::TokenType::SC_FORWARD_SLASH:
@@ -205,4 +198,60 @@ void Interpreter::checkNumberOperands(token::Token opr, std::any left,
                                       std::any right) {
   if (left.type() == typeid(float) && right.type() == typeid(float)) return;
   throw error::RuntimeError(opr, "Operands must be numbers");
+}
+
+std::any Interpreter::combineStrict(const token::Token &opr,
+                                    const std::any &left,
+                                    const std::any &right) {
+  if (left.type() == typeid(float) && right.type() == typeid(float)) {
+    return std::any_cast<float>(left) + std::any_cast<float>(right);
+  }
+
+  if (left.type() == typeid(std::string) &&
+      right.type() == typeid(std::string)) {
+    return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
+  }
+
+  throw error::RuntimeError(opr, "Operands must be two numbers or two strings");
+}
+
+std::any Interpreter::combineLoose(const token::Token &opr,
+                                   const std::any &left,
+                                   const std::any &right) {
+  // Loose binary operations where one of the operands is a string.
+  if (left.type() == typeid(std::string) && right.type() == typeid(float)) {
+    auto right_str = std::to_string(std::any_cast<float>(right));
+
+    if (helper::endsWith(right_str, ".000000")) {
+      right_str = right_str.substr(0, right_str.length() - 7);
+    }
+
+    return std::any_cast<std::string>(left) + right_str;
+  }
+
+  if (left.type() == typeid(float) && right.type() == typeid(std::string)) {
+    auto left_str = std::to_string(std::any_cast<float>(left));
+
+    if (helper::endsWith(left_str, ".000000")) {
+      left_str = left_str.substr(0, left_str.length() - 7);
+    }
+
+    return left_str + std::any_cast<std::string>(right);
+  }
+
+  if (left.type() == typeid(std::string) && right.type() == typeid(bool)) {
+    const auto right_str =
+        std::any_cast<bool>(right) ? token::KW_VERDADEIRO : token::KW_FALSO;
+
+    return std::any_cast<std::string>(left) + right_str;
+  }
+
+  if (left.type() == typeid(bool) && right.type() == typeid(std::string)) {
+    const auto left_str =
+        std::any_cast<bool>(left) ? token::KW_VERDADEIRO : token::KW_FALSO;
+
+    return left_str + std::any_cast<std::string>(right);
+  }
+
+  throw error::RuntimeError(opr, "Invalid operands of different types");
 }

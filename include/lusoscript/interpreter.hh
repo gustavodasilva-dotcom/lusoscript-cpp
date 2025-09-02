@@ -19,6 +19,10 @@ class Interpreter {
   bool isEqual(std::any a, std::any b);
   void checkNumberOperand(token::Token opr, std::any value);
   void checkNumberOperands(token::Token opr, std::any left, std::any right);
+  std::any combineStrict(const token::Token &opr, const std::any &left,
+                         const std::any &right);
+  std::any combineLoose(const token::Token &opr, const std::any &left,
+                        const std::any &right);
 };
 
 #endif
