@@ -23,6 +23,8 @@ class Interpreter {
                          const std::any &right);
   std::any combineLoose(const token::Token &opr, const std::any &left,
                         const std::any &right);
+  std::string castAnyFloatToStringAndFormat(std::any value);
+  std::string castAnyBooleanToStringAndFormat(std::any value);
 };
 
 #endif

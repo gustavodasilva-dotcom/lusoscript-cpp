@@ -1,3 +1,19 @@
+/*
+ * 09/02/2025 - The `comma()` function enforced the binary expression was
+ * enclosed in parentheses. Grammar-wise, it was incorrect, but it had the
+ * unintended consequence of making grouping expressions unparsed. To fix that,
+ * `comma()` only parses the expression, leaving `primary()` to
+ * check for parentheses.
+ *
+ * Nonetheless, there's still an issue. C produces different AST depending on
+ * the parentheses. If there's none around a comma expression, the precedence of
+ * the assignment operator is over the comma operator.
+ *
+ * When the time comes to parse statements, this distinction needs to be
+ * addressed at parsetime (https://www.geeksforgeeks.org/c/comma-in-c/),
+ * specially considering proper error handling.
+ */
+
 #include "lusoscript/parser.hh"
 
 Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
@@ -18,8 +34,6 @@ ast::Expr Parser::parse() {
 ast::Expr Parser::expression() { return comma(); }
 
 ast::Expr Parser::comma() {
-  const bool has_open_paren = match({token::TokenType::SC_OPEN_PAREN});
-
   ast::Expr left_expr;
 
   // In case the expression starts with the binary comma operator...
@@ -41,9 +55,6 @@ ast::Expr Parser::comma() {
   }
 
   while (match({token::TokenType::SC_COMMA})) {
-    if (!has_open_paren)
-      throw error(previous(), "Expected '(' before expression.");
-
     const token::Token opr = previous();
     ast::Expr right_expr = ternary();
 
@@ -51,10 +62,6 @@ ast::Expr Parser::comma() {
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
 
     left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
-  }
-
-  if (has_open_paren) {
-    consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after expression.");
   }
 
   return left_expr;

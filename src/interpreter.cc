@@ -150,17 +150,11 @@ std::string Interpreter::stringify(const std::any &value) {
   if (value.type() == typeid(nullptr)) return token::KW_NULO;
 
   if (value.type() == typeid(float)) {
-    auto text = std::to_string(std::any_cast<float>(value));
-
-    if (helper::endsWith(text, ".000000")) {
-      text = text.substr(0, text.length() - 7);
-    }
-
-    return text;
+    return castAnyFloatToStringAndFormat(value);
   }
 
   if (value.type() == typeid(bool)) {
-    return std::any_cast<bool>(value) ? token::KW_VERDADEIRO : token::KW_FALSO;
+    return castAnyBooleanToStringAndFormat(value);
   }
 
   return std::any_cast<std::string>(value);
@@ -218,40 +212,60 @@ std::any Interpreter::combineStrict(const token::Token &opr,
 std::any Interpreter::combineLoose(const token::Token &opr,
                                    const std::any &left,
                                    const std::any &right) {
-  // Loose binary operations where one of the operands is a string.
-  if (left.type() == typeid(std::string) && right.type() == typeid(float)) {
-    auto right_str = std::to_string(std::any_cast<float>(right));
+  // Loose binary operations where the left operand is a string.
+  if (left.type() == typeid(std::string)) {
+    const auto left_str = std::any_cast<std::string>(left);
 
-    if (helper::endsWith(right_str, ".000000")) {
-      right_str = right_str.substr(0, right_str.length() - 7);
+    if (right.type() == typeid(float)) {
+      return left_str + castAnyFloatToStringAndFormat(right);
     }
 
-    return std::any_cast<std::string>(left) + right_str;
-  }
-
-  if (left.type() == typeid(float) && right.type() == typeid(std::string)) {
-    auto left_str = std::to_string(std::any_cast<float>(left));
-
-    if (helper::endsWith(left_str, ".000000")) {
-      left_str = left_str.substr(0, left_str.length() - 7);
+    if (right.type() == typeid(bool)) {
+      return left_str + castAnyBooleanToStringAndFormat(right);
     }
 
-    return left_str + std::any_cast<std::string>(right);
+    throw error::RuntimeError(opr, "Invalid right-hand side operand type");
   }
 
-  if (left.type() == typeid(std::string) && right.type() == typeid(bool)) {
-    const auto right_str =
-        std::any_cast<bool>(right) ? token::KW_VERDADEIRO : token::KW_FALSO;
+  // Loose binary operations where the left operand is a float.
+  if (left.type() == typeid(float)) {
+    auto left_str = castAnyFloatToStringAndFormat(left);
 
-    return std::any_cast<std::string>(left) + right_str;
+    if (right.type() == typeid(std::string)) {
+      return left_str + std::any_cast<std::string>(right);
+    }
+
+    if (right.type() == typeid(bool)) {
+      return left_str;
+    }
+
+    throw error::RuntimeError(opr, "Invalid right-hand side operand type");
   }
 
-  if (left.type() == typeid(bool) && right.type() == typeid(std::string)) {
-    const auto left_str =
-        std::any_cast<bool>(left) ? token::KW_VERDADEIRO : token::KW_FALSO;
+  // Loose binary operations where the left operand is a boolean.
+  if (left.type() == typeid(bool)) {
+    if (right.type() == typeid(std::string)) {
+      return castAnyBooleanToStringAndFormat(left) +
+             std::any_cast<std::string>(right);
+    }
 
-    return left_str + std::any_cast<std::string>(right);
+    if (right.type() == typeid(float)) {
+      return castAnyFloatToStringAndFormat(right);
+    }
+
+    throw error::RuntimeError(opr, "Invalid right-hand side operand type");
   }
 
   throw error::RuntimeError(opr, "Invalid operands of different types");
+}
+
+std::string Interpreter::castAnyFloatToStringAndFormat(std::any value) {
+  auto str = std::to_string(std::any_cast<float>(value));
+
+  return helper::endsWith(str, ".000000") ? str.substr(0, str.length() - 7)
+                                          : str;
+}
+
+std::string Interpreter::castAnyBooleanToStringAndFormat(std::any value) {
+  return std::any_cast<bool>(value) ? token::KW_VERDADEIRO : token::KW_FALSO;
 }
