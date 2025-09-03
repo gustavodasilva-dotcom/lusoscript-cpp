@@ -9,12 +9,7 @@ var b = 5;
 imprima(a + b);
 
 var c;
-imprima("An uninitialized variable is: " + c);
+imprima(c); // throws a runtime error because it's uninitialized
 
-c = 20;
-imprima("... and now is: " + c);
-
-c = "a string!";
-imprima("... and now is " + c);
-
-imprima(d); // it's undefined, so it throws an runtime error
+c = nulo;
+imprima(c);

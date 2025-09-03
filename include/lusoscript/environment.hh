@@ -7,6 +7,9 @@
 
 #include "lusoscript/token.hh"
 
+namespace env {
+struct Uninitialized {};
+
 class Environment {
  public:
   explicit Environment();
@@ -20,5 +23,6 @@ class Environment {
   Environment *enclosing_;
   std::unordered_map<std::string, std::any> values_;
 };
+}  // namespace env
 
 #endif

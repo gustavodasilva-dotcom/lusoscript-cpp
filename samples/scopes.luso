@@ -23,4 +23,10 @@ imprima(a);
 imprima(b);
 imprima(c);
 
-// Example retrieved from the book "Crafting Interpreters," by Robert Nystrom.
+var d = 1;
+{
+    var d = d + 2;
+    imprima(d); // 3
+}
+
+// Examples retrieved from the book "Crafting Interpreters," by Robert Nystrom.

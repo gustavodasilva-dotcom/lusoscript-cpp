@@ -36,6 +36,7 @@ class Lexer {
   bool match(char expected);
   void addToken(token::TokenType token_type);
   void addToken(token::TokenType token_type, std::any literal);
+  std::string getLexeme();
 };
 
 #endif

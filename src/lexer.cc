@@ -178,9 +178,12 @@ void Lexer::scanIdentifier() {
   if (it != token::Keywords.end()) {
     addToken(it->second);
   } else {
-    addToken(text == token::KW_NULO ? token::TokenType::KW_NULO
-                                    : token::TokenType::LT_IDENTIFIER,
-             nullptr);
+    if (text == token::KW_NULO) {
+      addToken(token::TokenType::KW_NULO, nullptr);
+    } else {
+      tokens_.push_back(
+          {.type = token::TokenType::LT_IDENTIFIER, .lexeme = getLexeme()});
+    }
   }
 }
 
@@ -221,6 +224,10 @@ void Lexer::addToken(token::TokenType token_type) {
 }
 
 void Lexer::addToken(token::TokenType token_type, std::any literal) {
-  std::string lexeme = source_.substr(start_, current_ - start_);
+  const auto lexeme = getLexeme();
   tokens_.push_back({token_type, lexeme, literal, line_});
+}
+
+std::string Lexer::getLexeme() {
+  return source_.substr(start_, current_ - start_);
 }

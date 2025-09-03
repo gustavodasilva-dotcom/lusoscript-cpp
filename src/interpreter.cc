@@ -24,7 +24,8 @@ void Interpreter::execute(const ast::Stmt &stmt) {
     Interpreter &interpreter;
 
     void operator()(const ast::Block &block) {
-      interpreter.executeBlock(block, Environment{interpreter.current_env_});
+      interpreter.executeBlock(block,
+                               env::Environment{interpreter.current_env_});
     };
 
     void operator()(const ast::Expression &expression) {
@@ -37,16 +38,15 @@ void Interpreter::execute(const ast::Stmt &stmt) {
     }
 
     void operator()(const ast::Var &variable) {
-      std::any value = nullptr;
+      std::any value = env::Uninitialized{};
 
-      const auto &identifier = variable.name.lexeme;
       const auto &initializer = variable.initializer;
 
       if (initializer.has_value()) {
         value = interpreter.evaluate(*initializer.value());
       }
 
-      interpreter.current_env_.define(identifier.value(), value);
+      interpreter.current_env_.define(variable.name.lexeme.value(), value);
     }
 
     void operator()(const ast::ErrorStmt &error) {
@@ -58,8 +58,8 @@ void Interpreter::execute(const ast::Stmt &stmt) {
 }
 
 void Interpreter::executeBlock(const ast::Block &block,
-                               const Environment &env) {
-  Environment &prev = current_env_;
+                               const env::Environment &env) {
+  env::Environment &prev = current_env_;
 
   current_env_ = env;
 
@@ -202,7 +202,15 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
     }
 
     std::any operator()(const ast::Variable &variable) {
-      return interpreter.current_env_.get(variable.name);
+      const auto value = interpreter.current_env_.get(variable.name);
+
+      if (value.type() == typeid(env::Uninitialized)) {
+        throw error::RuntimeError(
+            variable.name,
+            "Uninitialized variable '" + variable.name.lexeme.value() + "'");
+      }
+
+      return value;
     }
 
     std::any operator()(const ast::ErrorExpr &error) {

@@ -2,12 +2,12 @@
 
 #include "lusoscript/error.hh"
 
-Environment::Environment() : enclosing_(nullptr), values_({}) {}
+env::Environment::Environment() : enclosing_(nullptr), values_({}) {}
 
-Environment::Environment(Environment *enclosing)
+env::Environment::Environment(env::Environment *enclosing)
     : enclosing_(enclosing), values_({}) {}
 
-std::any Environment::get(const token::Token &token) {
+std::any env::Environment::get(const token::Token &token) {
   const auto &identifier = token.lexeme.value();
 
   const auto it = values_.find(identifier);
@@ -18,11 +18,12 @@ std::any Environment::get(const token::Token &token) {
   throw error::RuntimeError(token, "Undefined variable '" + identifier + "'");
 }
 
-void Environment::define(const std::string &name, const std::any &value) {
+void env::Environment::define(const std::string &name, const std::any &value) {
   values_[name] = value;
 }
 
-void Environment::assign(const token::Token &token, const std::any &value) {
+void env::Environment::assign(const token::Token &token,
+                              const std::any &value) {
   const auto &identifier = token.lexeme.value();
 
   const auto it = values_.find(identifier);
