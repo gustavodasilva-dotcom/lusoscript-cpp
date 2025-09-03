@@ -2,18 +2,6 @@
 
 #include <iostream>
 
-void throwIfBooleanHasNoValue(std::optional<bool> opt_bool) {
-  if (!opt_bool.has_value()) {
-    throw std::runtime_error("Expected boolean value.");
-  }
-}
-
-void throwIfLiteralHasNoValue(std::optional<std::string> opt_lit) {
-  if (!opt_lit.has_value()) {
-    throw std::runtime_error("Expected a literal value.");
-  }
-}
-
 std::string ast::AstPrinter::print(const Expr &expression) {
   struct ExprVisitor {
     AstPrinter &printer;
