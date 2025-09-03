@@ -9,11 +9,15 @@
 
 class Environment {
  public:
+  explicit Environment();
+  explicit Environment(Environment *enclosing);
+
   std::any get(const token::Token &token);
   void define(const std::string &name, const std::any &value);
   void assign(const token::Token &token, const std::any &value);
 
  private:
+  Environment *enclosing_;
   std::unordered_map<std::string, std::any> values_;
 };
 

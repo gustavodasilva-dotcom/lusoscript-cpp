@@ -16,9 +16,10 @@ class Interpreter {
 
  private:
   error::ErrorState *error_state_;
-  Environment environment_;
+  Environment current_env_;
 
   void execute(const ast::Stmt &stmt);
+  void executeBlock(const ast::Block &block, const Environment &env);
   std::any evaluate(const ast::Expr &expr);
   bool isTruthy(std::any value);
   bool isEqual(std::any a, std::any b);

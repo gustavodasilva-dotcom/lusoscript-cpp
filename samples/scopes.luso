@@ -1,0 +1,26 @@
+var a = "global a";
+var b = "global b";
+var c = "global c";
+
+{
+    var a = "outer a";
+    var b = "outer b";
+
+    {
+        var a = "inner a";
+
+        imprima(a);
+        imprima(b);
+        imprima(c);
+    }
+
+    imprima(a);
+    imprima(b);
+    imprima(c);
+}
+
+imprima(a);
+imprima(b);
+imprima(c);
+
+// Example retrieved from the book "Crafting Interpreters," by Robert Nystrom.

@@ -68,8 +68,32 @@ ast::Stmt Parser::varDeclaration() {
 
 ast::Stmt Parser::statement() {
   if (match({token::TokenType::KW_IMPRIMA})) return imprimaStatement();
+  if (match({token::TokenType::SC_OPEN_CURLY})) {
+    std::vector<ast::Stmt> stmts = block();
+
+    std::vector<ast::StmtPtr> stmt_ptrs;
+    stmt_ptrs.reserve(stmts.size());
+
+    for (auto &s : stmts) {
+      stmt_ptrs.emplace_back(allocator_->make_unique<ast::Stmt>(std::move(s)));
+    }
+
+    return ast::Stmt{ast::Block{std::move(stmt_ptrs)}};
+  }
 
   return expressionStatement();
+}
+
+std::vector<ast::Stmt> Parser::block() {
+  std::vector<ast::Stmt> statements;
+
+  while (!check(token::TokenType::SC_CLOSE_CURLY) && !isAtEnd()) {
+    statements.push_back(declaration());
+  }
+
+  consume(token::TokenType::SC_CLOSE_CURLY, "Expected '}' after block.");
+
+  return statements;
 }
 
 ast::Stmt Parser::imprimaStatement() {

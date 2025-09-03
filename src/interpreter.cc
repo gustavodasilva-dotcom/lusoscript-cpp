@@ -7,7 +7,7 @@
 #include "lusoscript/helper.hh"
 
 Interpreter::Interpreter(error::ErrorState *error_state)
-    : error_state_(error_state), environment_({}) {}
+    : error_state_(error_state), current_env_({}) {}
 
 void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
   try {
@@ -22,6 +22,10 @@ void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
 void Interpreter::execute(const ast::Stmt &stmt) {
   struct VoidVisitor {
     Interpreter &interpreter;
+
+    void operator()(const ast::Block &block) {
+      interpreter.executeBlock(block, Environment{interpreter.current_env_});
+    };
 
     void operator()(const ast::Expression &expression) {
       interpreter.evaluate(*expression.expression);
@@ -42,7 +46,7 @@ void Interpreter::execute(const ast::Stmt &stmt) {
         value = interpreter.evaluate(*initializer.value());
       }
 
-      interpreter.environment_.define(identifier.value(), value);
+      interpreter.current_env_.define(identifier.value(), value);
     }
 
     void operator()(const ast::ErrorStmt &error) {
@@ -53,13 +57,26 @@ void Interpreter::execute(const ast::Stmt &stmt) {
   std::visit(visitor, stmt.var);
 }
 
+void Interpreter::executeBlock(const ast::Block &block,
+                               const Environment &env) {
+  Environment &prev = current_env_;
+
+  current_env_ = env;
+
+  for (auto &stmt : block.stmts) {
+    execute(*stmt);
+  }
+
+  current_env_ = prev;
+}
+
 std::any Interpreter::evaluate(const ast::Expr &expr) {
   struct AnyVisitor {
     Interpreter &interpreter;
 
     std::any operator()(const ast::Assign &assign) {
       const std::any &value = interpreter.evaluate(*assign.value);
-      interpreter.environment_.assign(assign.name, value);
+      interpreter.current_env_.assign(assign.name, value);
       return value;
     }
 
@@ -185,7 +202,7 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
     }
 
     std::any operator()(const ast::Variable &variable) {
-      return interpreter.environment_.get(variable.name);
+      return interpreter.current_env_.get(variable.name);
     }
 
     std::any operator()(const ast::ErrorExpr &error) {

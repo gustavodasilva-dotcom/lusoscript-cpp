@@ -2,7 +2,6 @@
 #define LUSOSCRIPT_PARSER_H
 
 #include <optional>
-#include <vector>
 
 #include "arena.hh"
 #include "ast.hh"
@@ -20,6 +19,7 @@ class Parser {
   ast::Stmt declaration();
   ast::Stmt varDeclaration();
   ast::Stmt statement();
+  std::vector<ast::Stmt> block();
   ast::Stmt imprimaStatement();
   ast::Stmt expressionStatement();
   ast::Expr expression();

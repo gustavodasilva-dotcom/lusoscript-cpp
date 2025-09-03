@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <variant>
+#include <vector>
 
 #include "arena.hh"
 #include "token.hh"
@@ -61,6 +62,10 @@ struct Expr {
       var;
 };
 
+struct Block {
+  std::vector<StmtPtr> stmts;
+};
+
 struct Expression {
   ExprPtr expression;
 };
@@ -79,7 +84,7 @@ struct ErrorStmt {
 };
 
 struct Stmt {
-  std::variant<Expression, Imprima, Var, ErrorStmt> var;
+  std::variant<Block, Expression, Imprima, Var, ErrorStmt> var;
 };
 
 class AstPrinter {

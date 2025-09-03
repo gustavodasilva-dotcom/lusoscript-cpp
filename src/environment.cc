@@ -2,14 +2,20 @@
 
 #include "lusoscript/error.hh"
 
-std::any Environment::get(const token::Token &token) {
-  const auto &identifier = token.lexeme;
+Environment::Environment() : enclosing_(nullptr), values_({}) {}
 
-  const auto it = values_.find(identifier.value());
+Environment::Environment(Environment *enclosing)
+    : enclosing_(enclosing), values_({}) {}
+
+std::any Environment::get(const token::Token &token) {
+  const auto &identifier = token.lexeme.value();
+
+  const auto it = values_.find(identifier);
   if (it != values_.end()) return it->second;
 
-  throw error::RuntimeError(token,
-                            "Undefined variable '" + identifier.value() + "'");
+  if (enclosing_ != nullptr) return enclosing_->get(token);
+
+  throw error::RuntimeError(token, "Undefined variable '" + identifier + "'");
 }
 
 void Environment::define(const std::string &name, const std::any &value) {
@@ -17,14 +23,18 @@ void Environment::define(const std::string &name, const std::any &value) {
 }
 
 void Environment::assign(const token::Token &token, const std::any &value) {
-  const auto &identifier = token.lexeme;
+  const auto &identifier = token.lexeme.value();
 
-  const auto it = values_.find(identifier.value());
+  const auto it = values_.find(identifier);
   if (it != values_.end()) {
-    values_[identifier.value()] = value;
+    values_[identifier] = value;
     return;
   }
 
-  throw error::RuntimeError(token,
-                            "Undefined variable '" + identifier.value() + "'");
+  if (enclosing_ != nullptr) {
+    enclosing_->assign(token, value);
+    return;
+  }
+
+  throw error::RuntimeError(token, "Undefined variable '" + identifier + "'");
 }
