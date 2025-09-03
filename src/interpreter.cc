@@ -7,7 +7,7 @@
 #include "lusoscript/helper.hh"
 
 Interpreter::Interpreter(error::ErrorState *error_state)
-    : error_state_(error_state) {}
+    : error_state_(error_state), environment_({}) {}
 
 void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
   try {
@@ -30,6 +30,23 @@ void Interpreter::execute(const ast::Stmt &stmt) {
     void operator()(const ast::Imprima &imprima) {
       const std::any value = interpreter.evaluate(*imprima.expression);
       std::cout << interpreter.stringify(value) << std::endl;
+    }
+
+    void operator()(const ast::Var &variable) {
+      std::any value = nullptr;
+
+      const auto &identifier = variable.name.lexeme;
+      const auto &initializer = variable.initializer;
+
+      if (initializer.has_value()) {
+        value = interpreter.evaluate(*initializer.value());
+      }
+
+      interpreter.environment_.define(identifier.value(), value);
+    }
+
+    void operator()(const ast::ErrorStmt &error) {
+      assert(false && "Overload not implemented.");
     }
   };
   VoidVisitor visitor{.interpreter = *this};
@@ -161,26 +178,16 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
                                                "' not supported.");
     }
 
-    std::any operator()(const ast::Error &error) {
+    std::any operator()(const ast::Variable &variable) {
+      return interpreter.environment_.get(variable.name);
+    }
+
+    std::any operator()(const ast::ErrorExpr &error) {
       assert(false && "Overload not implemented.");
     }
   };
   AnyVisitor visitor{.interpreter = *this};
   return std::visit(visitor, expr.var);
-}
-
-std::string Interpreter::stringify(const std::any &value) {
-  if (value.type() == typeid(nullptr)) return token::KW_NULO;
-
-  if (value.type() == typeid(float)) {
-    return castAnyFloatToStringAndFormat(value);
-  }
-
-  if (value.type() == typeid(bool)) {
-    return castAnyBooleanToStringAndFormat(value);
-  }
-
-  return std::any_cast<std::string>(value);
 }
 
 bool Interpreter::isTruthy(std::any value) {
@@ -229,7 +236,9 @@ std::any Interpreter::combineStrict(const token::Token &opr,
     return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
   }
 
-  throw error::RuntimeError(opr, "Operands must be two numbers or two strings");
+  throw error::RuntimeError(
+      opr,
+      "Operands must be two numbers or two strings for strict combination");
 }
 
 std::any Interpreter::combineLoose(const token::Token &opr,
@@ -240,11 +249,15 @@ std::any Interpreter::combineLoose(const token::Token &opr,
     const auto left_str = std::any_cast<std::string>(left);
 
     if (right.type() == typeid(float)) {
-      return left_str + castAnyFloatToStringAndFormat(right);
+      return left_str + stringify(right);
     }
 
     if (right.type() == typeid(bool)) {
-      return left_str + castAnyBooleanToStringAndFormat(right);
+      return left_str + stringify(right);
+    }
+
+    if (right.type() == typeid(nullptr)) {
+      return left_str + stringify(right);
     }
 
     throw error::RuntimeError(opr, "Invalid right-hand side operand type");
@@ -252,13 +265,13 @@ std::any Interpreter::combineLoose(const token::Token &opr,
 
   // Loose binary operations where the left operand is a float.
   if (left.type() == typeid(float)) {
-    auto left_str = castAnyFloatToStringAndFormat(left);
+    auto left_str = stringify(left);
 
     if (right.type() == typeid(std::string)) {
       return left_str + std::any_cast<std::string>(right);
     }
 
-    if (right.type() == typeid(bool)) {
+    if (right.type() == typeid(bool) || right.type() == typeid(nullptr)) {
       return left_str;
     }
 
@@ -268,27 +281,32 @@ std::any Interpreter::combineLoose(const token::Token &opr,
   // Loose binary operations where the left operand is a boolean.
   if (left.type() == typeid(bool)) {
     if (right.type() == typeid(std::string)) {
-      return castAnyBooleanToStringAndFormat(left) +
-             std::any_cast<std::string>(right);
+      return stringify(left) + std::any_cast<std::string>(right);
     }
 
     if (right.type() == typeid(float)) {
-      return castAnyFloatToStringAndFormat(right);
+      return stringify(right);
     }
 
     throw error::RuntimeError(opr, "Invalid right-hand side operand type");
   }
 
-  throw error::RuntimeError(opr, "Invalid operands of different types");
+  throw error::RuntimeError(opr, "Unsupported loose combination operands");
 }
 
-std::string Interpreter::castAnyFloatToStringAndFormat(std::any value) {
-  auto str = std::to_string(std::any_cast<float>(value));
+std::string Interpreter::stringify(const std::any &value) {
+  if (value.type() == typeid(nullptr)) return token::KW_NULO;
 
-  return helper::endsWith(str, ".000000") ? str.substr(0, str.length() - 7)
-                                          : str;
-}
+  if (value.type() == typeid(float)) {
+    auto str = std::to_string(std::any_cast<float>(value));
 
-std::string Interpreter::castAnyBooleanToStringAndFormat(std::any value) {
-  return std::any_cast<bool>(value) ? token::KW_VERDADEIRO : token::KW_FALSO;
+    return helper::endsWith(str, ".000000") ? str.substr(0, str.length() - 7)
+                                            : str;
+  }
+
+  if (value.type() == typeid(bool)) {
+    return std::any_cast<bool>(value) ? token::KW_VERDADEIRO : token::KW_FALSO;
+  }
+
+  return std::any_cast<std::string>(value);
 }

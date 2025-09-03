@@ -27,14 +27,43 @@ std::vector<ast::Stmt> Parser::parse() {
   std::vector<ast::Stmt> statements;
 
   while (!isAtEnd()) {
-    try {
-      statements.push_back(statement());
-    } catch (error::ParserError) {
-      synchronize();
-    }
+    statements.push_back(declaration());
   }
 
   return statements;
+}
+
+ast::Stmt Parser::declaration() {
+  try {
+    if (match({token::TokenType::KW_VAR})) return varDeclaration();
+
+    return statement();
+  } catch (error::ParserError) {
+    const token::Token prev_token = previous();
+
+    synchronize();
+
+    return ast::Stmt{ast::ErrorStmt{prev_token}};
+  }
+}
+
+ast::Stmt Parser::varDeclaration() {
+  token::Token name =
+      consume(token::TokenType::LT_IDENTIFIER, "Expected variable name.");
+
+  auto var_decl = ast::Var{name};
+
+  if (match({token::TokenType::MC_EQUAL})) {
+    ast::Expr initializer = expression();
+
+    auto init_ptr = allocator_->make_unique<ast::Expr>(std::move(initializer));
+    var_decl.initializer = std::move(init_ptr);
+  }
+
+  consume(token::TokenType::SC_SEMICOLON,
+          "Expected ';' after variable declaration.");
+
+  return ast::Stmt{std::move(var_decl)};
 }
 
 ast::Stmt Parser::statement() {
@@ -82,7 +111,7 @@ ast::Expr Parser::comma() {
     // before the dangling comma) and passes the right-hand side to it (metadata
     // for later use).
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::Error{std::move(right)}};
+    left_expr = ast::Expr{ast::ErrorExpr{std::move(right)}};
   } else {
     // Parse the ternary (descending) as usual.
     left_expr = ternary();
@@ -141,7 +170,7 @@ ast::Expr Parser::equality() {
     ast::Expr right_expr = comparison();
 
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::Error{std::move(right)}};
+    left_expr = ast::Expr{ast::ErrorExpr{std::move(right)}};
   } else {
     left_expr = comparison();
   }
@@ -177,7 +206,7 @@ ast::Expr Parser::comparison() {
     ast::Expr right_expr = term();
 
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::Error{{std::move(right)}}};
+    left_expr = ast::Expr{ast::ErrorExpr{{std::move(right)}}};
   } else {
     left_expr = term();
   }
@@ -208,7 +237,7 @@ ast::Expr Parser::term() {
     ast::Expr right_expr = factor();
 
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::Error{{std::move(right)}}};
+    left_expr = ast::Expr{ast::ErrorExpr{{std::move(right)}}};
   } else {
     left_expr = factor();
   }
@@ -243,7 +272,7 @@ ast::Expr Parser::factor() {
     ast::Expr right_expr = unary();
 
     auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::Error{std::move(right)}};
+    left_expr = ast::Expr{ast::ErrorExpr{std::move(right)}};
   } else {
     left_expr = unary();
   }
@@ -289,6 +318,10 @@ ast::Expr Parser::primary() {
 
   if (match({token::TokenType::LT_NUMBER, token::TokenType::LT_STRING})) {
     return ast::Expr{ast::Literal{previous().type, previous().literal}};
+  }
+
+  if (match({token::TokenType::LT_IDENTIFIER})) {
+    return ast::Expr{ast::Variable{previous()}};
   }
 
   if (match({token::TokenType::SC_OPEN_PAREN})) {

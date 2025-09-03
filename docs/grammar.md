@@ -8,10 +8,12 @@ LusoScript's formal grammar specification is as follows:
 
 | Nonterminal | Rule |
 |-------------|------|
-| program	  | → *statement** **EOF** ; |
+| program	  | → (*declaration*)* **EOF** ; |
+| declaration | → *varDecl* \| *statement* ; |
 | statement	  | → *exprStmt* \| *imprimaStmt* ; |
+| varDecl	  | → `var` **IDENTIFIER** ( `=` *expression* )? `;` ; |
 | exprStmt	  | → *expression* `;` ; |
-| imprimaStmt | → `"imprima"` + `"("` + *expression* + `")"` `;` ; |
+| imprimaStmt | → `imprima` + `(` + *expression* + `)` `;` ; |
 | expression  | → *comma* ; |
 | comma		  | → *ternary* ( `,` *ternary* )* ; |
 | ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
@@ -20,7 +22,9 @@ LusoScript's formal grammar specification is as follows:
 | term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |
 | factor      | → *unary* ( ( `/` \| `*` ) *unary* )* ; |
 | unary       | → ( `!` \| `-` ) *unary* \| *primary* ; |
-| primary     | → **NUMBER** \| **STRING** \| `verdadeiro` \| `falso` \| `nulo` \| `(` *expression* `)` ; |
+| primary     | → **NUMBER** \| **STRING** \| `verdadeiro` \| `falso` \| `nulo` \| `(` *expression* `)` \| **IDENTIFIER** ; |
+
+(*varDecl* are declaration statements. A declaration is not restricted to a variable; it can be a function declaration, a class declaration etc.)
 
 ## Comments
 

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ast.hh"
+#include "environment.hh"
 #include "error.hh"
 
 class Interpreter {
@@ -15,10 +16,10 @@ class Interpreter {
 
  private:
   error::ErrorState *error_state_;
+  Environment environment_;
 
   void execute(const ast::Stmt &stmt);
   std::any evaluate(const ast::Expr &expr);
-  std::string stringify(const std::any &value);
   bool isTruthy(std::any value);
   bool isEqual(std::any a, std::any b);
   void checkNumberOperand(token::Token opr, std::any value);
@@ -27,8 +28,7 @@ class Interpreter {
                          const std::any &right);
   std::any combineLoose(const token::Token &opr, const std::any &left,
                         const std::any &right);
-  std::string castAnyFloatToStringAndFormat(std::any value);
-  std::string castAnyBooleanToStringAndFormat(std::any value);
+  std::string stringify(const std::any &value);
 };
 
 #endif

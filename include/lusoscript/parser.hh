@@ -17,6 +17,8 @@ class Parser {
   std::vector<ast::Stmt> parse();
 
  private:
+  ast::Stmt declaration();
+  ast::Stmt varDeclaration();
   ast::Stmt statement();
   ast::Stmt imprimaStatement();
   ast::Stmt expressionStatement();

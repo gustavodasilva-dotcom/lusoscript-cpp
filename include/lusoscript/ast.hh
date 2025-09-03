@@ -42,12 +42,17 @@ struct Unary {
   ExprPtr right;
 };
 
-struct Error {
+struct Variable {
+  token::Token name;
+};
+
+struct ErrorExpr {
   ExprPtr expr;
 };
 
 struct Expr {
-  std::variant<Ternary, Binary, Grouping, Literal, Unary, Error> var;
+  std::variant<Ternary, Binary, Grouping, Literal, Unary, Variable, ErrorExpr>
+      var;
 };
 
 struct Expression {
@@ -58,8 +63,17 @@ struct Imprima {
   ExprPtr expression;
 };
 
+struct Var {
+  token::Token name;
+  std::optional<ExprPtr> initializer;
+};
+
+struct ErrorStmt {
+  token::Token token;
+};
+
 struct Stmt {
-  std::variant<Expression, Imprima> var;
+  std::variant<Expression, Imprima, Var, ErrorStmt> var;
 };
 
 class AstPrinter {

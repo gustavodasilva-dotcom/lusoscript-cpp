@@ -172,18 +172,16 @@ void Lexer::scanIdentifier() {
 
   std::string text = source_.substr(start_, current_ - start_);
 
-  token::TokenType token_type;
-
   // If the text extracted does not correspond to a keyword, treat it as a user
   // identifier.
   const auto it = token::Keywords.find(text);
   if (it != token::Keywords.end()) {
-    token_type = it->second;
+    addToken(it->second);
   } else {
-    token_type = token::TokenType::LT_IDENTIFIER;
+    addToken(text == token::KW_NULO ? token::TokenType::KW_NULO
+                                    : token::TokenType::LT_IDENTIFIER,
+             nullptr);
   }
-
-  addToken(token_type);
 }
 
 bool Lexer::isDigit(char c) { return c >= '0' && c <= '9'; }

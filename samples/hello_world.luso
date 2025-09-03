@@ -3,3 +3,10 @@ imprima("Olá, mundo!"); // "Hello world" in Portuguese
 imprima(1 + 1);
 
 imprima(verdadeiro);
+
+var a = 1;
+var b = 5;
+imprima(a + b);
+
+var c;
+imprima("An uninitialized variable is: " + c);

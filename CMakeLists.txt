@@ -7,6 +7,7 @@ add_library(lusoscript
 	src/arena.cc
 	src/ast.cc
 	src/driver.cc
+	src/environment.cc
 	src/error.cc
 	src/helper.cc
 	src/interpreter.cc

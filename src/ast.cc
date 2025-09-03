@@ -88,7 +88,19 @@ std::string ast::AstPrinter::print(const Expr &expression) {
       printer.output_.append(")");
     }
 
-    void operator()(const Error &error) {
+    void operator()(const Variable &variable) {
+      const auto &lexeme = variable.name.lexeme;
+
+      printer.output_.append("(");
+
+      printer.output_.append("var");
+      printer.output_.append(" ");
+      printer.output_.append(lexeme.value());
+
+      printer.output_.append(")");
+    }
+
+    void operator()(const ErrorExpr &error) {
       printer.output_.append("(");
 
       printer.output_.append("error");
