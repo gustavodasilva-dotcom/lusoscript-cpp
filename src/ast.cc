@@ -6,6 +6,19 @@ std::string ast::AstPrinter::print(const Expr &expression) {
   struct ExprVisitor {
     AstPrinter &printer;
 
+    void operator()(const Assign &assign) {
+      printer.output_.append("(");
+
+      printer.output_.append("assign");
+      printer.output_.append(" ");
+      printer.output_.append(assign.name.lexeme.value());
+      printer.output_.append("[");
+      printer.print(*assign.value);
+      printer.output_.append("]");
+
+      printer.output_.append(")");
+    }
+
     void operator()(const Ternary &ternary) {
       printer.output_.append("(");
 

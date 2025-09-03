@@ -14,6 +14,11 @@ struct Stmt;
 using ExprPtr = std::unique_ptr<Expr, arena::NoopDeleter<Expr>>;
 using StmtPtr = std::unique_ptr<Stmt, arena::NoopDeleter<Stmt>>;
 
+struct Assign {
+  token::Token name;
+  ExprPtr value;
+};
+
 struct Ternary {
   ExprPtr condition;
   token::Token then_opr;
@@ -51,7 +56,8 @@ struct ErrorExpr {
 };
 
 struct Expr {
-  std::variant<Ternary, Binary, Grouping, Literal, Unary, Variable, ErrorExpr>
+  std::variant<Assign, Ternary, Binary, Grouping, Literal, Unary, Variable,
+               ErrorExpr>
       var;
 };
 

@@ -23,6 +23,7 @@ class Parser {
   ast::Stmt imprimaStatement();
   ast::Stmt expressionStatement();
   ast::Expr expression();
+  ast::Expr assignment();
   ast::Expr comma();
   ast::Expr ternary();
   ast::Expr equality();

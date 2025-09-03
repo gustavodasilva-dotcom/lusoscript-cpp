@@ -94,7 +94,27 @@ ast::Stmt Parser::expressionStatement() {
   return ast::Stmt{ast::Expression{std::move(expr_ptr)}};
 }
 
-ast::Expr Parser::expression() { return comma(); }
+ast::Expr Parser::expression() { return assignment(); }
+
+ast::Expr Parser::assignment() {
+  ast::Expr expr = comma();
+
+  if (match({token::TokenType::MC_EQUAL})) {
+    const token::Token equals = previous();
+    ast::Expr value = assignment();
+
+    if (std::holds_alternative<ast::Variable>(expr.var)) {
+      const auto &var = std::get<ast::Variable>(expr.var);
+
+      auto value_ptr = allocator_->make_unique<ast::Expr>(std::move(value));
+      return ast::Expr{ast::Assign{var.name, std::move(value_ptr)}};
+    }
+
+    error(equals, "Invalid assignment target.");
+  }
+
+  return expr;
+}
 
 ast::Expr Parser::comma() {
   ast::Expr left_expr;

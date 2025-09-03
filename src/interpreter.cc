@@ -57,6 +57,12 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
   struct AnyVisitor {
     Interpreter &interpreter;
 
+    std::any operator()(const ast::Assign &assign) {
+      const std::any &value = interpreter.evaluate(*assign.value);
+      interpreter.environment_.assign(assign.name, value);
+      return value;
+    }
+
     std::any operator()(const ast::Ternary &ternary) {
       const std::any condition = interpreter.evaluate(*ternary.condition);
 

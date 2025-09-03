@@ -10,3 +10,11 @@ imprima(a + b);
 
 var c;
 imprima("An uninitialized variable is: " + c);
+
+c = 20;
+imprima("... and now is: " + c);
+
+c = "a string!";
+imprima("... and now is " + c);
+
+imprima(d); // it's undefined, so it throws an runtime error

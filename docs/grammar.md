@@ -14,7 +14,8 @@ LusoScript's formal grammar specification is as follows:
 | varDecl	  | → `var` **IDENTIFIER** ( `=` *expression* )? `;` ; |
 | exprStmt	  | → *expression* `;` ; |
 | imprimaStmt | → `imprima` + `(` + *expression* + `)` `;` ; |
-| expression  | → *comma* ; |
+| expression  | → *assigment* ; |
+| assignment  | → **IDENTIFIER** `=` *assigment* \| *comma* ; |
 | comma		  | → *ternary* ( `,` *ternary* )* ; |
 | ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
 | equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
