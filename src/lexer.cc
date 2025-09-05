@@ -181,8 +181,9 @@ void Lexer::scanIdentifier() {
     if (text == token::KW_NULO) {
       addToken(token::TokenType::KW_NULO, nullptr);
     } else {
-      tokens_.push_back(
-          {.type = token::TokenType::LT_IDENTIFIER, .lexeme = getLexeme()});
+      tokens_.push_back({.type = token::TokenType::LT_IDENTIFIER,
+                         .lexeme = getLexeme(),
+                         .line = line_});
     }
   }
 }
