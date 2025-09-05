@@ -7,7 +7,8 @@
 #include "lusoscript/lexer.hh"
 #include "lusoscript/parser.hh"
 
-void Driver::process(error::ErrorState *error_state, std::string source) {
+void Driver::process(error::ErrorState *error_state, std::string source,
+                     const bool &is_repl_input) {
   Lexer lexer(std::move(source), error_state);
   std::vector<token::Token> tokens = lexer.scanTokens();
 
@@ -18,7 +19,7 @@ void Driver::process(error::ErrorState *error_state, std::string source) {
   const auto statements = parser.parse();
 
   if (!error_state->getHadError()) {
-    Interpreter interpreter{error_state};
+    Interpreter interpreter{error_state, is_repl_input};
     interpreter.interpret(statements);
   }
 }

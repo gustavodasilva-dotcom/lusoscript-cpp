@@ -6,8 +6,11 @@
 
 #include "lusoscript/helper.hh"
 
-Interpreter::Interpreter(error::ErrorState *error_state)
-    : error_state_(error_state), current_env_({}) {}
+Interpreter::Interpreter(error::ErrorState *error_state,
+                         const bool &is_repl_input)
+    : error_state_(error_state),
+      current_env_({}),
+      is_repl_input_(is_repl_input) {}
 
 void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
   try {
@@ -29,7 +32,11 @@ void Interpreter::execute(const ast::Stmt &stmt) {
     };
 
     void operator()(const ast::Expression &expression) {
-      interpreter.evaluate(*expression.expression);
+      const auto result = interpreter.evaluate(*expression.expression);
+
+      if (interpreter.is_repl_input_) {
+        std::cout << interpreter.stringify(result) << std::endl;
+      }
     };
 
     void operator()(const ast::Imprima &imprima) {

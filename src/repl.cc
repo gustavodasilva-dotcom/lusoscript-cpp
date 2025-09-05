@@ -15,7 +15,7 @@ void Repl::run() {
   error::ErrorState error_state;
 
   while (std::getline(std::cin, input)) {
-    driver.process(&error_state, std::move(input));
+    driver.process(&error_state, std::move(input), true);
 
     error_state.resetHadError();
     error_state.resetHadRuntimeError();

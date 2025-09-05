@@ -1,0 +1,16 @@
+// unary expressions
+1;
+"Hello world!";
+verdadeiro;
+!falso;
+
+// binary expressions
+(1, 2, 3, 4, 5);
+1 + 1;
+10 / 2;
+1 * 10;
+1 > 10;
+verdadeiro ? "Here" : falso ? "Now here" : "Or here";
+falso == falso;
+verdadeiro == verdadeiro;
+"Olá" + " " + "mundo!";

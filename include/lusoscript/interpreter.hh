@@ -10,13 +10,15 @@
 
 class Interpreter {
  public:
-  explicit Interpreter(error::ErrorState *error_state);
+  explicit Interpreter(error::ErrorState *error_state,
+                       const bool &is_repl_input);
 
   void interpret(const std::vector<ast::Stmt> &stmts);
 
  private:
   error::ErrorState *error_state_;
   env::Environment current_env_;
+  bool is_repl_input_;
 
   void execute(const ast::Stmt &stmt);
   void executeBlock(const ast::Block &block, const env::Environment &env);

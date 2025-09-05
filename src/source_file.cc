@@ -38,7 +38,7 @@ void SourceFile::run(std::string file_path) {
   error::ErrorState error_state;
 
   Driver driver;
-  driver.process(&error_state, std::move(file_content));
+  driver.process(&error_state, std::move(file_content), false);
 
   if (error_state.getHadError()) {
     error_state.summary();

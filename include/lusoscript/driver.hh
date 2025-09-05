@@ -7,7 +7,8 @@
 
 class Driver {
  public:
-  void process(error::ErrorState *error_state, std::string source);
+  void process(error::ErrorState *error_state, std::string source,
+               const bool &is_repl_input);
 };
 
 #endif
