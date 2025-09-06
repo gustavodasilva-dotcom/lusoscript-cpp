@@ -69,6 +69,7 @@ ast::Stmt Parser::varDeclaration() {
 ast::Stmt Parser::statement() {
   if (match({token::TokenType::KW_SE})) return ifStatement();
   if (match({token::TokenType::KW_IMPRIMA})) return imprimaStatement();
+  if (match({token::TokenType::KW_ENQUANTO})) return whileStatement();
   if (match({token::TokenType::SC_OPEN_CURLY})) {
     std::vector<ast::Stmt> stmts = block();
 
@@ -83,6 +84,21 @@ ast::Stmt Parser::statement() {
   }
 
   return expressionStatement();
+}
+
+ast::Stmt Parser::whileStatement() {
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected `(` after `enquanto`.");
+
+  ast::Expr condition = expression();
+
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
+
+  ast::Stmt body = statement();
+
+  auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
+  auto body_ptr = allocator_->make_unique<ast::Stmt>(std::move(body));
+
+  return ast::Stmt{ast::While{std::move(cond_ptr), std::move(body_ptr)}};
 }
 
 ast::Stmt Parser::ifStatement() {

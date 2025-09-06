@@ -65,6 +65,18 @@ void Interpreter::execute(const ast::Stmt &stmt) {
       }
     }
 
+    void operator()(const ast::While &stmt) {
+      // Immediately evaluates the condition, and, if truthy, the statement body
+      // is executed.
+      auto condition = interpreter.evaluate(*stmt.condition);
+      while (interpreter.isTruthy(condition)) {
+        interpreter.execute(*stmt.body);
+        // Evaluates the condition again after the body is executed, because if
+        // it is not truthy, the loop will be left immediately.
+        condition = interpreter.evaluate(*stmt.condition);
+      }
+    }
+
     void operator()(const ast::ErrorStmt &error) {
       assert(false && "Overload not implemented.");
     }

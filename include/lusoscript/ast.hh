@@ -91,12 +91,17 @@ struct Var {
   std::optional<ExprPtr> initializer;
 };
 
+struct While {
+  ExprPtr condition;
+  StmtPtr body;
+};
+
 struct ErrorStmt {
   token::Token token;
 };
 
 struct Stmt {
-  std::variant<Block, Expression, Imprima, Var, If, ErrorStmt> var;
+  std::variant<Block, Expression, Imprima, Var, If, While, ErrorStmt> var;
 };
 
 class AstPrinter {

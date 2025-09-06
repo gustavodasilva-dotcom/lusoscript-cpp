@@ -20,6 +20,7 @@ class Parser {
   ast::Stmt ifStatement();
   std::vector<ast::Stmt> block();
   ast::Stmt imprimaStatement();
+  ast::Stmt whileStatement();
   ast::Stmt expressionStatement();
   ast::Expr expression();
   ast::Expr comma();

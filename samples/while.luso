@@ -1,0 +1,7 @@
+var a = 1;
+
+// prints 1 to 10
+enquanto (a <= 10) {
+    imprima(a);
+    a = a + 1;
+}
