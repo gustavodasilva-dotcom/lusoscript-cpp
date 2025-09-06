@@ -92,13 +92,7 @@ ast::Stmt Parser::ifStatement() {
 
   consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
 
-  const bool has_if_curly = match({token::TokenType::SC_OPEN_CURLY});
-
   ast::Stmt then_branch = statement();
-
-  if (has_if_curly) {
-    consume(token::TokenType::SC_CLOSE_CURLY, "Expected `}` after scope.");
-  }
 
   auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
   auto then_ptr = allocator_->make_unique<ast::Stmt>(std::move(then_branch));
@@ -106,13 +100,7 @@ ast::Stmt Parser::ifStatement() {
   auto if_stmt = ast::If{std::move(cond_ptr), std::move(then_ptr)};
 
   if (match({token::TokenType::KW_SENAO})) {
-    const bool has_else_curly = match({token::TokenType::SC_OPEN_CURLY});
-
     ast::Stmt else_branch = statement();
-
-    if (has_else_curly) {
-      consume(token::TokenType::SC_CLOSE_CURLY, "Expected `}` after scope.");
-    }
 
     if_stmt.else_branch =
         allocator_->make_unique<ast::Stmt>(std::move(else_branch));
