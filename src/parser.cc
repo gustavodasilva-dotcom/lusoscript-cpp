@@ -16,7 +16,7 @@
 
 #include "lusoscript/parser.hh"
 
-Parser::Parser(arena::Arena *allocator, error::ErrorState *error_state,
+Parser::Parser(arena::Arena *allocator, error::ErrorState &error_state,
                std::vector<token::Token> tokens)
     : allocator_(allocator),
       error_state_(error_state),
@@ -145,8 +145,8 @@ ast::Expr Parser::comma() {
 
   // In case the expression starts with the binary comma operator...
   if (match({token::TokenType::SC_COMMA})) {
-    error_state_->error(previous(),
-                        "Binary operator ',' has no left-hand side.");
+    error_state_.error(previous(),
+                       "Binary operator ',' has no left-hand side.");
 
     // Parses the right-hand side and discards it by not assigning it.
     ast::Expr right_expr = ternary();
@@ -207,9 +207,9 @@ ast::Expr Parser::equality() {
   // In case the expression starts with one of the binary equality operators...
   if (match(operators)) {
     const token::Token prev_token = previous();
-    error_state_->error(prev_token, "Binary operator '" +
-                                        token::toString(prev_token.type) +
-                                        "' has no left-hand side.");
+    error_state_.error(prev_token, "Binary operator '" +
+                                       token::toString(prev_token.type) +
+                                       "' has no left-hand side.");
 
     ast::Expr right_expr = comparison();
 
@@ -243,9 +243,9 @@ ast::Expr Parser::comparison() {
   // operators...
   if (match(operators)) {
     const token::Token prev_token = previous();
-    error_state_->error(prev_token, "Binary operator '" +
-                                        token::toString(prev_token.type) +
-                                        "' has no left-hand side.");
+    error_state_.error(prev_token, "Binary operator '" +
+                                       token::toString(prev_token.type) +
+                                       "' has no left-hand side.");
 
     ast::Expr right_expr = term();
 
@@ -275,8 +275,8 @@ ast::Expr Parser::term() {
   // subtraction operator is parsed as a unary expression at the highest
   // level.
   if (match({token::TokenType::SC_PLUS})) {
-    error_state_->error(previous(),
-                        "Binary operator '+' has no left-hand side.");
+    error_state_.error(previous(),
+                       "Binary operator '+' has no left-hand side.");
 
     ast::Expr right_expr = factor();
 
@@ -309,9 +309,9 @@ ast::Expr Parser::factor() {
   // multiplication operators...
   if (match(operators)) {
     const token::Token prev_token = previous();
-    error_state_->error(prev_token, "Binary operator '" +
-                                        token::toString(prev_token.type) +
-                                        "' has no left-hand side.");
+    error_state_.error(prev_token, "Binary operator '" +
+                                       token::toString(prev_token.type) +
+                                       "' has no left-hand side.");
 
     ast::Expr right_expr = unary();
 
@@ -414,7 +414,7 @@ token::Token Parser::peek() { return tokens_.at(current_); }
 token::Token Parser::previous() { return tokens_.at(current_ - 1); }
 
 error::ParserError Parser::error(token::Token token, std::string message) {
-  error_state_->error(token, message);
+  error_state_.error(token, message);
   return error::ParserError(message);
 }
 

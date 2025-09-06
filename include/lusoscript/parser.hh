@@ -1,8 +1,6 @@
 #ifndef LUSOSCRIPT_PARSER_H
 #define LUSOSCRIPT_PARSER_H
 
-#include <optional>
-
 #include "arena.hh"
 #include "ast.hh"
 #include "error.hh"
@@ -10,7 +8,7 @@
 
 class Parser {
  public:
-  explicit Parser(arena::Arena *allocator, error::ErrorState *error_state,
+  explicit Parser(arena::Arena *allocator, error::ErrorState &error_state,
                   std::vector<token::Token> tokens);
 
   std::vector<ast::Stmt> parse();
@@ -43,7 +41,7 @@ class Parser {
   void synchronize();
 
   arena::Arena *allocator_;
-  error::ErrorState *error_state_;
+  error::ErrorState &error_state_;
   const std::vector<token::Token> tokens_;
   int current_;
 };

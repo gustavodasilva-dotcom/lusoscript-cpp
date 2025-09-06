@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "lusoscript/driver.hh"
-#include "lusoscript/error.hh"
+#include "lusoscript/state.hh"
 
 void Repl::run() {
   Driver driver;
@@ -12,13 +12,16 @@ void Repl::run() {
 
   std::cout << "> ";
 
-  error::ErrorState error_state;
+  state::AppState app_state{.mode = state::RunningMode::REPL,
+                            .error = error::ErrorState{}};
 
   while (std::getline(std::cin, input)) {
-    driver.process(&error_state, std::move(input), true);
+    app_state.source = input;
 
-    error_state.resetHadError();
-    error_state.resetHadRuntimeError();
+    driver.process(&app_state);
+
+    app_state.error.resetHadError();
+    app_state.error.resetHadRuntimeError();
 
     std::cout << "> ";
   }

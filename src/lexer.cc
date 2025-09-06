@@ -1,7 +1,7 @@
 #include "lusoscript/lexer.hh"
 
-Lexer::Lexer(std::string source, error::ErrorState *error_state)
-    : source_(std::move(source)),
+Lexer::Lexer(const std::string &source, error::ErrorState &error_state)
+    : source_(source),
       error_state_(error_state),
       start_(0),
       current_(0),
@@ -102,7 +102,7 @@ void Lexer::scanToken() {
       } else if (isAlpha(c)) {
         scanIdentifier();
       } else {
-        error_state_->error(line_, "Unexpected character.");
+        error_state_.error(line_, "Unexpected character.");
       }
       break;
   }
@@ -116,7 +116,7 @@ void Lexer::scanString() {
   }
 
   if (isAtEnd()) {
-    error_state_->error(line_, "Unterminated string.");
+    error_state_.error(line_, "Unterminated string.");
     return;
   }
 
@@ -131,7 +131,7 @@ void Lexer::scanString() {
 void Lexer::scanMultilineComment() {
   while (peek() != '*' || peekNext() != '/') {
     if (isAtEnd()) {
-      error_state_->error(line_, "Unterminated multiline comment.");
+      error_state_.error(line_, "Unterminated multiline comment.");
       return;
     }
 

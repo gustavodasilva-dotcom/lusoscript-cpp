@@ -6,11 +6,9 @@
 
 #include "lusoscript/helper.hh"
 
-Interpreter::Interpreter(error::ErrorState *error_state,
-                         const bool &is_repl_input)
-    : error_state_(error_state),
-      current_env_({}),
-      is_repl_input_(is_repl_input) {}
+Interpreter::Interpreter(error::ErrorState &error_state,
+                         const state::RunningMode &mode)
+    : error_state_(error_state), current_env_({}), mode_(mode) {}
 
 void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
   try {
@@ -18,7 +16,7 @@ void Interpreter::interpret(const std::vector<ast::Stmt> &stmts) {
       execute(stmt);
     }
   } catch (error::RuntimeError &error) {
-    error_state_->runtimeError(error);
+    error_state_.runtimeError(error);
   }
 }
 
@@ -34,7 +32,9 @@ void Interpreter::execute(const ast::Stmt &stmt) {
     void operator()(const ast::Expression &expression) {
       const auto result = interpreter.evaluate(*expression.expression);
 
-      if (interpreter.is_repl_input_) {
+      // If the interpreter is running in "REPL mode," print the result of
+      // evaluated expressions.
+      if (interpreter.mode_ == state::RunningMode::REPL) {
         std::cout << interpreter.stringify(result) << std::endl;
       }
     };

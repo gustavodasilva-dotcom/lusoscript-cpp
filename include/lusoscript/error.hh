@@ -2,7 +2,6 @@
 #define LUSOSCRIPT_ERROR_H
 
 #include <stdexcept>
-#include <string>
 
 #include "token.hh"
 

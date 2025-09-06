@@ -1,24 +1,21 @@
 #ifndef LUSOSCRIPT_INTERPRETER_H
 #define LUSOSCRIPT_INTERPRETER_H
 
-#include <any>
-#include <vector>
-
 #include "ast.hh"
 #include "environment.hh"
-#include "error.hh"
+#include "state.hh"
 
 class Interpreter {
  public:
-  explicit Interpreter(error::ErrorState *error_state,
-                       const bool &is_repl_input);
+  explicit Interpreter(error::ErrorState &error_state,
+                       const state::RunningMode &mode);
 
   void interpret(const std::vector<ast::Stmt> &stmts);
 
  private:
-  error::ErrorState *error_state_;
+  error::ErrorState &error_state_;
   env::Environment current_env_;
-  bool is_repl_input_;
+  const state::RunningMode &mode_;
 
   void execute(const ast::Stmt &stmt);
   void executeBlock(const ast::Block &block, const env::Environment &env);

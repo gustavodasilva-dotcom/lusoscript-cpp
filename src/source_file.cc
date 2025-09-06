@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "lusoscript/driver.hh"
-#include "lusoscript/error.hh"
+#include "lusoscript/state.hh"
 
 void SourceFile::run(std::string file_path) {
   std::filesystem::path path = file_path;
@@ -35,17 +35,19 @@ void SourceFile::run(std::string file_path) {
     file_content = contents_stream.str();
   }
 
-  error::ErrorState error_state;
+  state::AppState app_state{.mode = state::RunningMode::SourceFile,
+                            .source = std::move(file_content),
+                            .error = error::ErrorState{}};
 
   Driver driver;
-  driver.process(&error_state, std::move(file_content), false);
+  driver.process(&app_state);
 
-  if (error_state.getHadError()) {
-    error_state.summary();
+  if (app_state.error.getHadError()) {
+    app_state.error.summary();
     exit(EX_DATAERR);
   }
 
-  if (error_state.getHadRuntimeError()) {
+  if (app_state.error.getHadRuntimeError()) {
     exit(EX_SOFTWARE);
   }
 }

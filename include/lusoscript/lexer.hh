@@ -1,21 +1,20 @@
 #ifndef LUSOSCRIPT_LEXER_H
 #define LUSOSCRIPT_LEXER_H
 
-#include <string>
 #include <vector>
 
-#include "error.hh"
+#include "state.hh"
 #include "token.hh"
 
 class Lexer {
  public:
-  explicit Lexer(std::string source, error::ErrorState *error_state);
+  explicit Lexer(const std::string &source, error::ErrorState &error_state);
 
   std::vector<token::Token> scanTokens();
 
  private:
-  std::string source_;
-  error::ErrorState *error_state_;
+  const std::string &source_;
+  error::ErrorState &error_state_;
   std::vector<token::Token> tokens_;
   int start_;
   int current_;
