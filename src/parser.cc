@@ -67,6 +67,7 @@ ast::Stmt Parser::varDeclaration() {
 }
 
 ast::Stmt Parser::statement() {
+  if (match({token::TokenType::KW_PARA})) return forStatement();
   if (match({token::TokenType::KW_SE})) return ifStatement();
   if (match({token::TokenType::KW_IMPRIMA})) return imprimaStatement();
   if (match({token::TokenType::KW_ENQUANTO})) return whileStatement();
@@ -86,27 +87,103 @@ ast::Stmt Parser::statement() {
   return expressionStatement();
 }
 
-ast::Stmt Parser::whileStatement() {
-  consume(token::TokenType::SC_OPEN_PAREN, "Expected `(` after `enquanto`.");
+ast::Stmt Parser::forStatement() {
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected '(' after para.");
 
-  ast::Expr condition = expression();
+  std::optional<ast::Stmt> initializer;
 
-  consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
+  if (match({token::TokenType::SC_SEMICOLON})) {
+    // Empty initializer statement clause.
+    initializer = std::nullopt;
+  } else if (match({token::TokenType::KW_VAR})) {
+    initializer = varDeclaration();
+  } else {
+    initializer = expressionStatement();
+  }
+
+  std::optional<ast::Expr> condition = std::nullopt;
+
+  if (!check(token::TokenType::SC_SEMICOLON)) {
+    // Empty condition expression clause.
+    condition = expression();
+  }
+
+  consume(token::TokenType::SC_SEMICOLON, "Expected ';' after loop condition.");
+
+  std::optional<ast::Expr> increment = std::nullopt;
+
+  if (!check(token::TokenType::SC_CLOSE_PAREN)) {
+    // Empty increment expression clause.
+    increment = expression();
+  }
+
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after para clauses.");
 
   ast::Stmt body = statement();
 
-  auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
-  auto body_ptr = allocator_->make_unique<ast::Stmt>(std::move(body));
+  if (increment.has_value()) {
+    // For the increment, add, to the body, a block that contains the previous
+    // value of the body variable and the increment expression.
+    std::vector<ast::Stmt> stmts;
+    stmts.push_back(std::move(body));
 
-  return ast::Stmt{ast::While{std::move(cond_ptr), std::move(body_ptr)}};
+    auto incr_ptr =
+        allocator_->make_unique<ast::Expr>(std::move(increment.value()));
+    stmts.push_back({ast::Expression{std::move(incr_ptr)}});
+
+    std::vector<ast::StmtPtr> stmt_ptrs;
+    stmt_ptrs.reserve(stmts.size());
+
+    for (auto &s : stmts) {
+      stmt_ptrs.emplace_back(allocator_->make_unique<ast::Stmt>(std::move(s)));
+    }
+
+    // Here, the `body` variable is the actual loop body, followed by the
+    // increment expression.
+    body = ast::Stmt{ast::Block{std::move(stmt_ptrs)}};
+  }
+
+  if (!condition.has_value()) {
+    // If there's no condition, create an infinite loop.
+    condition = ast::Expr{ast::Literal{token::TokenType::KW_VERDADEIRO, true}};
+  }
+
+  // Here, the `body` variable is the primitive (`enquanto`) while loop, with
+  // the condition being either the user-defined one or the infinite loop.
+  auto cond_ptr =
+      allocator_->make_unique<ast::Expr>(std::move(condition.value()));
+  body = ast::Stmt{
+      ast::While{std::move(cond_ptr),
+                 allocator_->make_unique<ast::Stmt>(std::move(body))}};
+
+  if (initializer.has_value()) {
+    // If there's an initializer, it's executed once (variable `initializer`)
+    // before the loop (variable `body`).
+    std::vector<ast::Stmt> stmts;
+    stmts.push_back(std::move(initializer.value()));
+    stmts.push_back(std::move(body));
+
+    std::vector<ast::StmtPtr> stmt_ptrs;
+    stmt_ptrs.reserve(stmts.size());
+
+    for (auto &s : stmts) {
+      stmt_ptrs.emplace_back(allocator_->make_unique<ast::Stmt>(std::move(s)));
+    }
+
+    // Here, the `body` variable is the initializer followed by the (`enquanto`)
+    // while loop.
+    body = ast::Stmt{ast::Block{std::move(stmt_ptrs)}};
+  }
+
+  return body;
 }
 
 ast::Stmt Parser::ifStatement() {
-  consume(token::TokenType::SC_OPEN_PAREN, "Expected `(` after `se`.");
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected '(' after se.");
 
   ast::Expr condition = expression();
 
-  consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after condition.");
 
   ast::Stmt then_branch = statement();
 
@@ -125,18 +202,6 @@ ast::Stmt Parser::ifStatement() {
   return ast::Stmt{std::move(if_stmt)};
 }
 
-std::vector<ast::Stmt> Parser::block() {
-  std::vector<ast::Stmt> statements;
-
-  while (!check(token::TokenType::SC_CLOSE_CURLY) && !isAtEnd()) {
-    statements.push_back(declaration());
-  }
-
-  consume(token::TokenType::SC_CLOSE_CURLY, "Expected '}' after block.");
-
-  return statements;
-}
-
 ast::Stmt Parser::imprimaStatement() {
   consume(token::TokenType::SC_OPEN_PAREN, "Expected '(' before value.");
 
@@ -148,6 +213,33 @@ ast::Stmt Parser::imprimaStatement() {
 
   auto value_ptr = allocator_->make_unique<ast::Expr>(std::move(value));
   return ast::Stmt{ast::Imprima{std::move(value_ptr)}};
+}
+
+ast::Stmt Parser::whileStatement() {
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected '(' after enquanto.");
+
+  ast::Expr condition = expression();
+
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected ')' after condition.");
+
+  ast::Stmt body = statement();
+
+  auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
+  auto body_ptr = allocator_->make_unique<ast::Stmt>(std::move(body));
+
+  return ast::Stmt{ast::While{std::move(cond_ptr), std::move(body_ptr)}};
+}
+
+std::vector<ast::Stmt> Parser::block() {
+  std::vector<ast::Stmt> statements;
+
+  while (!check(token::TokenType::SC_CLOSE_CURLY) && !isAtEnd()) {
+    statements.push_back(declaration());
+  }
+
+  consume(token::TokenType::SC_CLOSE_CURLY, "Expected '}' after block.");
+
+  return statements;
 }
 
 ast::Stmt Parser::expressionStatement() {

@@ -17,10 +17,11 @@ class Parser {
   ast::Stmt declaration();
   ast::Stmt varDeclaration();
   ast::Stmt statement();
+  ast::Stmt forStatement();
   ast::Stmt ifStatement();
-  std::vector<ast::Stmt> block();
   ast::Stmt imprimaStatement();
   ast::Stmt whileStatement();
+  std::vector<ast::Stmt> block();
   ast::Stmt expressionStatement();
   ast::Expr expression();
   ast::Expr comma();
