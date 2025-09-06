@@ -1,0 +1,5 @@
+se (verdadeiro e verdadeiro) imprima("It's all true.");
+
+se (verdadeiro ou falso) imprima("Some are true.");
+
+se (falso ou falso) imprima("This won't even be printed.");

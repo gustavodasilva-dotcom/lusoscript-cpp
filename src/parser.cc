@@ -92,7 +92,13 @@ ast::Stmt Parser::ifStatement() {
 
   consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
 
+  const bool has_if_curly = match({token::TokenType::SC_OPEN_CURLY});
+
   ast::Stmt then_branch = statement();
+
+  if (has_if_curly) {
+    consume(token::TokenType::SC_CLOSE_CURLY, "Expected `}` after scope.");
+  }
 
   auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
   auto then_ptr = allocator_->make_unique<ast::Stmt>(std::move(then_branch));
@@ -100,7 +106,13 @@ ast::Stmt Parser::ifStatement() {
   auto if_stmt = ast::If{std::move(cond_ptr), std::move(then_ptr)};
 
   if (match({token::TokenType::KW_SENAO})) {
+    const bool has_else_curly = match({token::TokenType::SC_OPEN_CURLY});
+
     ast::Stmt else_branch = statement();
+
+    if (has_else_curly) {
+      consume(token::TokenType::SC_CLOSE_CURLY, "Expected `}` after scope.");
+    }
 
     if_stmt.else_branch =
         allocator_->make_unique<ast::Stmt>(std::move(else_branch));
@@ -143,10 +155,44 @@ ast::Stmt Parser::expressionStatement() {
   return ast::Stmt{ast::Expression{std::move(expr_ptr)}};
 }
 
-ast::Expr Parser::expression() { return assignment(); }
+ast::Expr Parser::expression() { return comma(); }
+
+ast::Expr Parser::comma() {
+  ast::Expr left_expr;
+
+  // In case the expression starts with the binary comma operator...
+  if (match({token::TokenType::SC_COMMA})) {
+    error_state_.error(previous(),
+                       "Binary operator ',' has no left-hand side.");
+
+    // Parses the right-hand side and discards it by not assigning it.
+    ast::Expr right_expr = assignment();
+
+    // Creates a placeholder for the invalid left-hand side expression (the spot
+    // before the dangling comma) and passes the right-hand side to it (metadata
+    // for later use).
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+    left_expr = ast::Expr{ast::ErrorExpr{std::move(right)}};
+  } else {
+    // Parse the assignment (descending) as usual.
+    left_expr = assignment();
+  }
+
+  while (match({token::TokenType::SC_COMMA})) {
+    const token::Token opr = previous();
+    ast::Expr right_expr = assignment();
+
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+
+    left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
+  }
+
+  return left_expr;
+}
 
 ast::Expr Parser::assignment() {
-  ast::Expr expr = comma();
+  ast::Expr expr = ternary();
 
   if (match({token::TokenType::MC_EQUAL})) {
     const token::Token equals = previous();
@@ -165,42 +211,8 @@ ast::Expr Parser::assignment() {
   return expr;
 }
 
-ast::Expr Parser::comma() {
-  ast::Expr left_expr;
-
-  // In case the expression starts with the binary comma operator...
-  if (match({token::TokenType::SC_COMMA})) {
-    error_state_.error(previous(),
-                       "Binary operator ',' has no left-hand side.");
-
-    // Parses the right-hand side and discards it by not assigning it.
-    ast::Expr right_expr = ternary();
-
-    // Creates a placeholder for the invalid left-hand side expression (the spot
-    // before the dangling comma) and passes the right-hand side to it (metadata
-    // for later use).
-    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-    left_expr = ast::Expr{ast::ErrorExpr{std::move(right)}};
-  } else {
-    // Parse the ternary (descending) as usual.
-    left_expr = ternary();
-  }
-
-  while (match({token::TokenType::SC_COMMA})) {
-    const token::Token opr = previous();
-    ast::Expr right_expr = ternary();
-
-    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
-    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
-
-    left_expr = ast::Expr{ast::Binary{std::move(left), opr, std::move(right)}};
-  }
-
-  return left_expr;
-}
-
 ast::Expr Parser::ternary() {
-  ast::Expr condition = equality();
+  ast::Expr condition = logicalOr();
 
   if (match({token::TokenType::MC_QUESTION})) {
     const auto question = previous();
@@ -221,6 +233,38 @@ ast::Expr Parser::ternary() {
   }
 
   return condition;
+}
+
+ast::Expr Parser::logicalOr() {
+  ast::Expr left_expr = logicalAnd();
+
+  while (match({token::TokenType::KW_OU})) {
+    const token::Token opr = previous();
+    ast::Expr right_expr = logicalAnd();
+
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+
+    left_expr = ast::Expr{ast::Logical{std::move(left), opr, std::move(right)}};
+  }
+
+  return left_expr;
+}
+
+ast::Expr Parser::logicalAnd() {
+  ast::Expr left_expr = equality();
+
+  while (match({token::TokenType::KW_E})) {
+    const token::Token opr = previous();
+    ast::Expr right_expr = equality();
+
+    auto left = allocator_->make_unique<ast::Expr>(std::move(left_expr));
+    auto right = allocator_->make_unique<ast::Expr>(std::move(right_expr));
+
+    left_expr = ast::Expr{ast::Logical{std::move(left), opr, std::move(right)}};
+  }
+
+  return left_expr;
 }
 
 ast::Expr Parser::equality() {

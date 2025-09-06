@@ -201,6 +201,18 @@ std::any Interpreter::evaluate(const ast::Expr &expr) {
 
     std::any operator()(const ast::Literal &literal) { return literal.value; }
 
+    std::any operator()(const ast::Logical &logical) {
+      const std::any left = interpreter.evaluate(*logical.left);
+
+      if (logical.opr.type == token::TokenType::KW_OU) {
+        if (interpreter.isTruthy(left)) return left;
+      } else {
+        if (!interpreter.isTruthy(left)) return left;
+      }
+
+      return interpreter.evaluate(*logical.right);
+    }
+
     std::any operator()(const ast::Unary &unary) {
       const std::any right = interpreter.evaluate(*unary.right);
 

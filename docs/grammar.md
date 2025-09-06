@@ -8,18 +8,20 @@ LusoScript's formal grammar specification is as follows:
 
 | Nonterminal | Rule |
 |-------------|------|
-| program	  | → (*declaration*)* **EOF** ; |
+| program	  | → ( *declaration* )* **EOF** ; |
 | declaration | → *varDecl* \| *statement* ; |
 | statement	  | → *exprStmt* \| *ifStmt* \| *imprimaStmt* \| *block* ; |
 | ifStmt	  | → `if` `(` *expression* `)` *statement* ( `else` *statement* )? ; |
-| block		  | → `{` + (*declaration*)* + `}` ; |
+| block		  | → `{` + ( *declaration* )* + `}` ; |
 | varDecl	  | → `var` **IDENTIFIER** ( `=` *expression* )? `;` ; |
 | exprStmt	  | → *expression* `;` ; |
 | imprimaStmt | → `imprima` + `(` + *expression* + `)` `;` ; |
-| expression  | → *assigment* ; |
-| assignment  | → **IDENTIFIER** `=` *assigment* \| *comma* ; |
-| comma		  | → *ternary* ( `,` *ternary* )* ; |
-| ternary	  | → *equality* ( `?` *expression* `:` *ternary* )? ; |
+| expression  | → *comma* ; |
+| comma		  | → *assignment* ( `,` *assignment* )* ; |
+| assignment  | → **IDENTIFIER** `=` *assigment* \| *ternary* ; |
+| ternary	  | → *logic_or* ( `?` *expression* `:` *ternary* )? ; |
+| logic_or	  | → *logic_and* ( `ou` *logic_and* )* ; |
+| logic_and	  | → *equality* ( `e` *equality* )* ; |
 | equality    | → *comparison* ( ( `!=` \| `==` ) *comparison* )* ; |
 | comparison  | → *term* ( ( `>` \| `>=` \| `<` \| `<=` ) *term* )* ; |
 | term        | → *factor* ( ( `-` \| `+` ) *factor* )* ; |

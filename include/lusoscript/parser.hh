@@ -22,9 +22,11 @@ class Parser {
   ast::Stmt imprimaStatement();
   ast::Stmt expressionStatement();
   ast::Expr expression();
-  ast::Expr assignment();
   ast::Expr comma();
+  ast::Expr assignment();
   ast::Expr ternary();
+  ast::Expr logicalOr();
+  ast::Expr logicalAnd();
   ast::Expr equality();
   ast::Expr comparison();
   ast::Expr term();

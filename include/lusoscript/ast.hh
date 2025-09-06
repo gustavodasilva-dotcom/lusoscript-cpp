@@ -43,6 +43,12 @@ struct Literal {
   std::any value;
 };
 
+struct Logical {
+  ExprPtr left;
+  token::Token opr;
+  ExprPtr right;
+};
+
 struct Unary {
   token::Token opr;
   ExprPtr right;
@@ -57,8 +63,8 @@ struct ErrorExpr {
 };
 
 struct Expr {
-  std::variant<Assign, Ternary, Binary, Grouping, Literal, Unary, Variable,
-               ErrorExpr>
+  std::variant<Assign, Ternary, Binary, Grouping, Literal, Logical, Unary,
+               Variable, ErrorExpr>
       var;
 };
 

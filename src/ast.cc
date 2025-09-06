@@ -79,6 +79,18 @@ std::string ast::AstPrinter::print(const Expr &expression) {
       };
     }
 
+    void operator()(const Logical &logical) {
+      printer.output_.append("(");
+
+      printer.output_.append(token::toString(logical.opr.type));
+      printer.output_.append(" ");
+      printer.print(*logical.left);
+      printer.output_.append(" ");
+      printer.print(*logical.right);
+
+      printer.output_.append(")");
+    }
+
     void operator()(const Unary &unary) {
       printer.output_.append("(");
 

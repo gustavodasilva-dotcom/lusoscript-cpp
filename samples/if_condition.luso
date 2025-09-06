@@ -1,0 +1,17 @@
+var a = 1;
+var b = 0;
+
+se (a > b)
+    imprima(a + " is greater than " + b + ".");
+
+b = 1;
+
+se (a > b)
+    imprima(a + " still is greater than " + b + ".");
+senao
+    imprima(a + " is less than " + b + ".");
+
+se (falso) {
+    imprima("a + b = " + (a + b));
+} senao
+    imprima("a * b = " + (a * b));
