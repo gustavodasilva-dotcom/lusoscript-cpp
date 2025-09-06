@@ -17,6 +17,7 @@ class Parser {
   ast::Stmt declaration();
   ast::Stmt varDeclaration();
   ast::Stmt statement();
+  ast::Stmt ifStatement();
   std::vector<ast::Stmt> block();
   ast::Stmt imprimaStatement();
   ast::Stmt expressionStatement();

@@ -67,6 +67,7 @@ ast::Stmt Parser::varDeclaration() {
 }
 
 ast::Stmt Parser::statement() {
+  if (match({token::TokenType::KW_SE})) return ifStatement();
   if (match({token::TokenType::KW_IMPRIMA})) return imprimaStatement();
   if (match({token::TokenType::SC_OPEN_CURLY})) {
     std::vector<ast::Stmt> stmts = block();
@@ -82,6 +83,30 @@ ast::Stmt Parser::statement() {
   }
 
   return expressionStatement();
+}
+
+ast::Stmt Parser::ifStatement() {
+  consume(token::TokenType::SC_OPEN_PAREN, "Expected `(` after `se`.");
+
+  ast::Expr condition = expression();
+
+  consume(token::TokenType::SC_CLOSE_PAREN, "Expected `)` after condition.");
+
+  ast::Stmt then_branch = statement();
+
+  auto cond_ptr = allocator_->make_unique<ast::Expr>(std::move(condition));
+  auto then_ptr = allocator_->make_unique<ast::Stmt>(std::move(then_branch));
+
+  auto if_stmt = ast::If{std::move(cond_ptr), std::move(then_ptr)};
+
+  if (match({token::TokenType::KW_SENAO})) {
+    ast::Stmt else_branch = statement();
+
+    if_stmt.else_branch =
+        allocator_->make_unique<ast::Stmt>(std::move(else_branch));
+  }
+
+  return ast::Stmt{std::move(if_stmt)};
 }
 
 std::vector<ast::Stmt> Parser::block() {

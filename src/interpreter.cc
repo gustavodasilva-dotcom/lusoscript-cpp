@@ -56,6 +56,15 @@ void Interpreter::execute(const ast::Stmt &stmt) {
       interpreter.current_env_.define(variable.name.lexeme.value(), value);
     }
 
+    void operator()(const ast::If &stmt) {
+      const auto condition = interpreter.evaluate(*stmt.condition);
+      if (interpreter.isTruthy(condition)) {
+        interpreter.execute(*stmt.then_branch);
+      } else if (stmt.else_branch.has_value()) {
+        interpreter.execute(*stmt.else_branch.value());
+      }
+    }
+
     void operator()(const ast::ErrorStmt &error) {
       assert(false && "Overload not implemented.");
     }

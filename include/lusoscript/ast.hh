@@ -70,6 +70,12 @@ struct Expression {
   ExprPtr expression;
 };
 
+struct If {
+  ExprPtr condition;
+  StmtPtr then_branch;
+  std::optional<StmtPtr> else_branch;
+};
+
 struct Imprima {
   ExprPtr expression;
 };
@@ -84,7 +90,7 @@ struct ErrorStmt {
 };
 
 struct Stmt {
-  std::variant<Block, Expression, Imprima, Var, ErrorStmt> var;
+  std::variant<Block, Expression, Imprima, Var, If, ErrorStmt> var;
 };
 
 class AstPrinter {

@@ -10,7 +10,8 @@ LusoScript's formal grammar specification is as follows:
 |-------------|------|
 | program	  | → (*declaration*)* **EOF** ; |
 | declaration | → *varDecl* \| *statement* ; |
-| statement	  | → *exprStmt* \| *imprimaStmt* \| *block* ; |
+| statement	  | → *exprStmt* \| *ifStmt* \| *imprimaStmt* \| *block* ; |
+| ifStmt	  | → `if` `(` *expression* `)` *statement* ( `else` *statement* )? ; |
 | block		  | → `{` + (*declaration*)* + `}` ; |
 | varDecl	  | → `var` **IDENTIFIER** ( `=` *expression* )? `;` ; |
 | exprStmt	  | → *expression* `;` ; |
